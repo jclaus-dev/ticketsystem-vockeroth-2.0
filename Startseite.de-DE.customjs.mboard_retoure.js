@@ -47,15 +47,16 @@ if (buttons.mboardRetoureConfirm) {
       });
     }
 
-    try {
-      await sendPlannerTicket({
-        kachelname: "M-Board Retoure",
-        text: detailText
-      });
-      [inputs.mboardOrder, inputs.mboardEAN, inputs.mboardCustomer, inputs.mboardState].forEach(inp => inp.value = "");
-      buttons.mboardRetoureConfirm.style.color = "white";
-      showView("tile");
-    } catch (err) {
+  try {
+    await sendPlannerTicket({
+      kachelname: "M-Board Retoure",
+      text: detailText
+    });
+    [inputs.mboardOrder, inputs.mboardEAN, inputs.mboardCustomer, inputs.mboardState].forEach(inp => inp.value = "");
+    buttons.mboardRetoureConfirm.style.color = "white";
+    showToast("Ticket für M-Board Retoure wurde erfolgreich erstellt.");
+    showView("tile");
+  } catch (err) {
       console.error("Fehler M-Board Retoure:", err);
       alert("Fehler: " + err.message);
       showView("mboardRetoure");

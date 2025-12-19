@@ -548,6 +548,7 @@ async function sendZalandoTicket({ kachelname, orderId, eans = [], reasons = [],
       eans: eanList,
       reasons: reasonList
     });
+    showToast("Ticket für Zalando Bestellung nicht erfüllbar wurde erfolgreich erstellt.");
   } catch (err) {
     console.error("Fehler beim Erstellen des Tickets:", err);
     alert("Fehler beim Erstellen des Tickets: " + err.message);

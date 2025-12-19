@@ -59,6 +59,7 @@ function formatDate(iso) {
 const currentTicketFilters = {
   status: "all",
   type: "all",
+  favorite: "all",
   search: ""
 };
 
@@ -67,7 +68,8 @@ let filtersInitialized = false;
 function updateFilterButtons(group, value) {
   const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
   buttons.forEach(btn => {
-    btn.classList.toggle("is-active", btn.dataset.filterValue === value);
+    const isActive = btn.dataset.filterValue === value && !(group === "favorite" && value === "all");
+    btn.classList.toggle("is-active", isActive);
   });
 }
 
@@ -80,8 +82,17 @@ function initTicketFilters() {
       const group = btn.dataset.filterGroup;
       const value = btn.dataset.filterValue;
       if (!group || !value) return;
-      currentTicketFilters[group] = value;
-      updateFilterButtons(group, value);
+      if (group === "favorite") {
+        currentTicketFilters.favorite = currentTicketFilters.favorite === "fav" ? "all" : "fav";
+        currentTicketFilters.status = "all";
+        updateFilterButtons("favorite", currentTicketFilters.favorite);
+        updateFilterButtons("status", currentTicketFilters.status);
+      } else {
+        currentTicketFilters[group] = value;
+        currentTicketFilters.favorite = "all";
+        updateFilterButtons("status", currentTicketFilters.status);
+        updateFilterButtons("favorite", currentTicketFilters.favorite);
+      }
       renderTickets();
     });
   });
@@ -109,6 +120,7 @@ function renderTickets() {
   const statusFilter = currentTicketFilters.status;
   const typeFilter = currentTicketFilters.type;
   const search = currentTicketFilters.search;
+  const favFilter = currentTicketFilters.favorite;
   const openCount = tickets.filter(t => !t.done).length;
   updateTicketsTabLabel(openCount);
   const filtered = tickets.filter(ticket => {
@@ -116,6 +128,8 @@ function renderTickets() {
     if (statusFilter === "done" && !ticket.done) return false;
     if (statusFilter === "open" && ticket.done) return false;
     if (typeFilter !== "all" && typeKey !== typeFilter) return false;
+    if (favFilter === "fav" && !ticket.isFav) return false;
+    if (favFilter === "nonfav" && ticket.isFav) return false;
     if (search) {
       const haystack = [
         ticket.kachelname,
@@ -170,6 +184,19 @@ function renderTickets() {
 
     const actions = document.createElement("div");
     actions.className = "ticket-actions";
+    const fav = document.createElement("span");
+    fav.className = `ticket-fav${ticket.isFav ? " is-fav" : ""}`;
+    fav.textContent = ticket.isFav ? "★" : "☆";
+    fav.title = ticket.isFav ? "Favorit entfernen" : "Als Favorit markieren";
+    fav.addEventListener("click", () => {
+      const all = loadTickets();
+      const ticketIndex = all.findIndex(t => t.id === ticket.id);
+      if (ticketIndex >= 0) {
+        all[ticketIndex].isFav = !all[ticketIndex].isFav;
+        saveTickets(all);
+        renderTickets();
+      }
+    });
     const toggleBtn = document.createElement("button");
     toggleBtn.type = "button";
     toggleBtn.className = "ticket-toggle";
@@ -184,6 +211,7 @@ function renderTickets() {
       }
     });
     actions.appendChild(toggleBtn);
+    actions.appendChild(fav);
 
     card.appendChild(info);
     card.appendChild(actions);
@@ -202,3 +230,6 @@ if (buttons.ticketsTab) {
     renderTickets();
   });
 }
+
+
+

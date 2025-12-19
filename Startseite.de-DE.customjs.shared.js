@@ -175,3 +175,22 @@ async function sendPlannerTicket(data = {}) {
   }
   return resText;
 }
+
+function showToast(message) {
+  if (!message) return;
+  let holder = document.getElementById("toastHolder");
+  if (!holder) {
+    holder = document.createElement("div");
+    holder.id = "toastHolder";
+    document.body.appendChild(holder);
+  }
+  const toast = document.createElement("div");
+  toast.className = "toast-notice";
+  toast.textContent = message;
+  holder.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add("is-visible"));
+  setTimeout(() => {
+    toast.classList.remove("is-visible");
+    setTimeout(() => toast.remove(), 250);
+  }, 4000);
+}
