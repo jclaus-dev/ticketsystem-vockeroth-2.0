@@ -1,0 +1,204 @@
+/* Startseite: local ticket overview */
+
+function getTicketStorageKey() {
+  const fil = inputs.filNr?.value.trim() || localStorage.getItem(SESSION_KEYS.filNr) || "unknown";
+  return `tickets:${fil}`;
+}
+
+function loadTickets() {
+  try {
+    const raw = localStorage.getItem(getTicketStorageKey());
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getTypeKeyFromName(name) {
+  if (!name) return "other";
+  const normalized = name
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, "")
+    .toLowerCase();
+
+  if (normalized.includes("zalandobestellungnicht")) return "zalando-bestellung";
+  if (normalized.includes("onlinegutscheine")) return "online-gutscheine";
+  if (normalized.includes("zalandopasswort")) return "zalando-passwort";
+  if (normalized.includes("sonstigesanliegen")) return "sonstiges";
+  if (normalized.includes("mboardprobleme")) return "mboard";
+  return "other";
+}
+
+function saveTickets(tickets) {
+  localStorage.setItem(getTicketStorageKey(), JSON.stringify(tickets));
+}
+
+function recordTicket(entry) {
+  const tickets = loadTickets();
+  tickets.unshift({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    createdAt: new Date().toISOString(),
+    personalnummer: inputs.persNr?.value.trim() || "",
+    filialnummer: inputs.filNr?.value.trim() || "",
+    done: false,
+    typeKey: entry.typeKey || getTypeKeyFromName(entry.kachelname),
+    ...entry
+  });
+  saveTickets(tickets);
+  const openCount = tickets.filter(t => !t.done).length;
+  updateTicketsTabLabel(openCount);
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return iso;
+  return d.toLocaleString("de-DE");
+}
+
+const currentTicketFilters = {
+  status: "all",
+  type: "all",
+  search: ""
+};
+
+let filtersInitialized = false;
+
+function updateFilterButtons(group, value) {
+  const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
+  buttons.forEach(btn => {
+    btn.classList.toggle("is-active", btn.dataset.filterValue === value);
+  });
+}
+
+function initTicketFilters() {
+  if (filtersInitialized) return;
+  filtersInitialized = true;
+  const filterButtons = document.querySelectorAll(".filter-button");
+  filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const group = btn.dataset.filterGroup;
+      const value = btn.dataset.filterValue;
+      if (!group || !value) return;
+      currentTicketFilters[group] = value;
+      updateFilterButtons(group, value);
+      renderTickets();
+    });
+  });
+
+  const searchInput = document.getElementById("ticketSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      currentTicketFilters.search = searchInput.value.trim().toLowerCase();
+      renderTickets();
+    });
+  }
+}
+
+function updateTicketsTabLabel(openCount) {
+  if (!buttons.ticketsTab) return;
+  buttons.ticketsTab.textContent = openCount > 0 ? `Tickets (${openCount})` : "Tickets";
+}
+
+function renderTickets() {
+  const listEl = document.getElementById("ticketsList");
+  const emptyEl = document.getElementById("ticketsEmpty");
+  if (!listEl || !emptyEl) return;
+
+  const tickets = loadTickets();
+  const statusFilter = currentTicketFilters.status;
+  const typeFilter = currentTicketFilters.type;
+  const search = currentTicketFilters.search;
+  const openCount = tickets.filter(t => !t.done).length;
+  updateTicketsTabLabel(openCount);
+  const filtered = tickets.filter(ticket => {
+    const typeKey = ticket.typeKey || getTypeKeyFromName(ticket.kachelname);
+    if (statusFilter === "done" && !ticket.done) return false;
+    if (statusFilter === "open" && ticket.done) return false;
+    if (typeFilter !== "all" && typeKey !== typeFilter) return false;
+    if (search) {
+      const haystack = [
+        ticket.kachelname,
+        ticket.details,
+        ticket.personalnummer,
+        ticket.filialnummer
+      ].filter(Boolean).join(" ").toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  listEl.innerHTML = "";
+
+  if (!filtered.length) {
+    emptyEl.style.display = "block";
+    return;
+  }
+
+  emptyEl.style.display = "none";
+  filtered.forEach((ticket, idx) => {
+    const card = document.createElement("div");
+    card.className = `ticket-card${ticket.done ? " done" : ""} is-animated`;
+    card.style.animationDelay = `${Math.min(200 * idx, 800)}ms`;
+    card.dataset.id = ticket.id;
+
+    const info = document.createElement("div");
+    info.className = "ticket-info";
+
+    const title = document.createElement("div");
+    title.className = "ticket-title";
+    title.textContent = ticket.kachelname || "Ticket";
+
+    const detailsBlock = document.createElement("div");
+    detailsBlock.className = "ticket-details-list";
+    const detailLines = (ticket.details || "").split("|").map(s => s.trim()).filter(Boolean);
+    if (detailLines.length) {
+      detailLines.forEach(line => {
+        const row = document.createElement("div");
+        row.textContent = line;
+        detailsBlock.appendChild(row);
+      });
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "ticket-meta";
+    meta.textContent = `Datum: ${formatDate(ticket.createdAt)} | Personalnummer ${ticket.personalnummer || "-"} | Filiale: ${ticket.filialnummer || "-"}`;
+
+    info.appendChild(title);
+    if (detailLines.length) info.appendChild(detailsBlock);
+    info.appendChild(meta);
+
+    const actions = document.createElement("div");
+    actions.className = "ticket-actions";
+    const toggleBtn = document.createElement("button");
+    toggleBtn.type = "button";
+    toggleBtn.className = "ticket-toggle";
+    toggleBtn.textContent = ticket.done ? "Nicht erledigt" : "Erledigt";
+    toggleBtn.addEventListener("click", () => {
+      const all = loadTickets();
+      const ticketIndex = all.findIndex(t => t.id === ticket.id);
+      if (ticketIndex >= 0) {
+        all[ticketIndex].done = !all[ticketIndex].done;
+        saveTickets(all);
+        renderTickets();
+      }
+    });
+    actions.appendChild(toggleBtn);
+
+    card.appendChild(info);
+    card.appendChild(actions);
+    listEl.appendChild(card);
+  });
+}
+
+if (buttons.homeTab) {
+  buttons.homeTab.addEventListener("click", () => showView("tile"));
+}
+if (buttons.ticketsTab) {
+  buttons.ticketsTab.addEventListener("click", () => {
+    if (buttons.ticketsTab.disabled) return;
+    showView("tickets");
+    initTicketFilters();
+    renderTickets();
+  });
+}
