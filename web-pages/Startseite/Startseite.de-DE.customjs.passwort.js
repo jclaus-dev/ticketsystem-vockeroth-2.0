@@ -25,7 +25,10 @@ Array.from(containers.pass1.querySelectorAll(".passwort-reason")).forEach(btn =>
         reason:     passReason,
         password:   ""
       })
-        .then(() => showView("tile"))
+        .then(() => {
+          showToast("Ticket für Zalando Passwort zurücksetzen wurde erfolgreich erstellt.");
+          showView("tile");
+        })
         .catch(err => {
           console.error("Fehler beim direkten Passwort-Reset-Ticket:", err);
           alert("Fehler beim Absenden: " + err.message);
@@ -107,6 +110,7 @@ buttons.passConfirm.addEventListener("click", async e => {
     });
     inputs.newPassword.value = "";
     buttons.passConfirm.style.color = "white";
+    showToast("Ticket für Zalando Passwort zurücksetzen wurde erfolgreich erstellt.");
     showView("tile");
   } catch (err) {
     console.error("Fehler beim Passwort-Reset:", err);

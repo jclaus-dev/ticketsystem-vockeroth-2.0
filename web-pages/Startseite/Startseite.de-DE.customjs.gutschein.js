@@ -77,6 +77,7 @@ arrowNext.addEventListener("click", async e => {
       gutscheincode: code,
       gutscheinwert: wert
     });
+    showToast("Ticket für Online Gutscheine wurde erfolgreich erstellt.");
     resetGutscheinForm();
     showView("tile");
   } catch (err) {
@@ -117,6 +118,7 @@ async function sendGutschein() {
       gutscheincode: inputs.gutschein.value.trim(),
       gutscheinwert: getEuroNumericValue()
     });
+    showToast("Ticket für Online Gutscheine wurde erfolgreich erstellt.");
     showView("tile");
   } catch (err) {
     console.error("Gutschein-Fehler:", err);
