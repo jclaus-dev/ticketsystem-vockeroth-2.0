@@ -73,3 +73,18 @@ buttons.save.addEventListener("click", () => {
   setTimeout(() => document.getElementById("savedNotice").style.display = "none", 4000);
   showView("tile");
 });
+
+if (buttons.reset) {
+  buttons.reset.addEventListener("click", () => {
+    [inputs.persNr, inputs.filNr].forEach(i => {
+      i.value = "";
+      i.style.border = "";
+    });
+    [SESSION_KEYS.persNr, SESSION_KEYS.filNr, SESSION_KEYS.expiresAt].forEach(k => localStorage.removeItem(k));
+    updateFilialPlaceholder();
+    validatePersonalFilial();
+    disableAllTiles();
+    if (buttons.ticketsTab) buttons.ticketsTab.disabled = true;
+    inputs.persNr.focus();
+  });
+}

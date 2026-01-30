@@ -131,6 +131,15 @@
         cursor: pointer;
         margin-top: 23.5px;
       }
+
+      #resetBtn {
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 23.5px;
+        background: #e6e6e6;
+      }
     
       /* ================ Responsiv: <1184 px ========== */
       @media (max-width:1183px) {
@@ -169,14 +178,15 @@
           <div class="user-fields">
             <div class="form-field">
               <label for="personalnummer">Personalnummer</label>
-              <input id="personalnummer" placeholder="Personalnummer" autocomplete="off">
+              <input id="personalnummer" placeholder="Personalnummer" autocomplete="off" data-allow-empty="true">
             </div>
     
             <div class="form-field">
               <label for="filialnummer">Filialnummer</label>
-              <input id="filialnummer" placeholder="Filialnummer" autocomplete="off">
+              <input id="filialnummer" placeholder="Filialnummer" autocomplete="off" data-allow-empty="true">
             </div>
     
+            <button id="resetBtn" type="button">Zurücksetzen</button>
             <button id="saveBtn">Bestätigen</button>
           </div>
         </div>

@@ -112,6 +112,7 @@ const buttons = {
   popupYes:       document.getElementById("popupYes"),
   popupNo:        document.getElementById("popupNo"),
   save:           document.getElementById("saveBtn"),
+  reset:          document.getElementById("resetBtn"),
   passPrev:       document.getElementById("passwordPrev"),
   passPrev1:      document.getElementById("passwordPrev1"),
   passConfirm:    document.getElementById("passwordConfirm"),

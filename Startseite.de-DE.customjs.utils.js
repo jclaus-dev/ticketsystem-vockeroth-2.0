@@ -97,6 +97,7 @@ function setupBlinkingPlaceholder(input) {
 
   input.addEventListener("blur", () => {
     if (input.value.trim() === "") {
+      if (input.dataset.allowEmpty === "true") return;
       setTimeout(() => input.focus(), 10);
     } else {
       input.classList.remove("blink-placeholder");

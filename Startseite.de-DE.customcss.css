@@ -599,6 +599,26 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   align-items: center;
 }
 
+.ticket-search-note {
+  color: #000000;
+  font-weight: 600;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.ticket-export-link {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.ticket-export-link:hover,
+.ticket-export-link:focus-visible {
+  text-decoration: none;
+}
+
 .ticket-search input {
   height: 28px;
   border-radius: 999px;

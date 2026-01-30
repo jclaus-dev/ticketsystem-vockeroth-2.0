@@ -104,6 +104,14 @@ function initTicketFilters() {
       renderTickets();
     });
   }
+
+  const exportLink = document.getElementById("ticketExportLink");
+  if (exportLink) {
+    exportLink.addEventListener("click", (event) => {
+      event.preventDefault();
+      downloadTicketsExcel();
+    });
+  }
 }
 
 function updateTicketsTabLabel(openCount) {
@@ -219,6 +227,46 @@ function renderTickets() {
   });
 }
 
+function downloadTicketsExcel() {
+  const tickets = loadTickets();
+  const header = [
+    "Datum",
+    "Ticket",
+    "Details",
+    "Personalnummer",
+    "Filiale",
+    "Favorit",
+    "Status"
+  ];
+
+  const rows = tickets.map(ticket => [
+    formatDate(ticket.createdAt),
+    ticket.kachelname || "Ticket",
+    (ticket.details || "").replace(/\s*\|\s*/g, " | "),
+    ticket.personalnummer || "",
+    ticket.filialnummer || "",
+    ticket.isFav ? "Ja" : "Nein",
+    ticket.done ? "Erledigt" : "Nicht erledigt"
+  ]);
+
+  const csv = [header, ...rows]
+    .map(cols => cols.map(value => `"${String(value).replace(/"/g, '""')}"`).join(";"))
+    .join("\n");
+
+  const bom = "\uFEFF";
+  const blob = new Blob([bom, csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const fil = inputs.filNr?.value.trim() || localStorage.getItem(SESSION_KEYS.filNr) || "unknown";
+  const dateStamp = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `tickets_${fil}_${dateStamp}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 if (buttons.homeTab) {
   buttons.homeTab.addEventListener("click", () => showView("tile"));
 }
@@ -230,6 +278,5 @@ if (buttons.ticketsTab) {
     renderTickets();
   });
 }
-
 
 
