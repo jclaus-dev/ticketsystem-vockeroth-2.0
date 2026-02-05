@@ -25,6 +25,9 @@ function validatePersonalFilial() {
   if (buttons.ticketsTab) {
     buttons.ticketsTab.disabled = !bothFilled;
   }
+  if (buttons.handbuchTab) {
+    buttons.handbuchTab.disabled = !bothFilled;
+  }
 }
 
 [inputs.persNr, inputs.filNr].forEach(inp => {
@@ -34,7 +37,9 @@ function validatePersonalFilial() {
     if (!inputs.persNr.value.trim() || !inputs.filNr.value.trim()) {
       disableAllTiles();
       if (buttons.ticketsTab) buttons.ticketsTab.disabled = true;
+    if (buttons.handbuchTab) buttons.handbuchTab.disabled = true;
     }
+    if (buttons.handbuchTab) buttons.handbuchTab.disabled = true;
   });
 });
 
@@ -69,6 +74,7 @@ buttons.save.addEventListener("click", () => {
   updateFilialPlaceholder();
   enableAllTiles();
   if (buttons.ticketsTab) buttons.ticketsTab.disabled = false;
+  if (buttons.handbuchTab) buttons.handbuchTab.disabled = false;
   document.getElementById("savedNotice").style.display = "block";
   setTimeout(() => document.getElementById("savedNotice").style.display = "none", 4000);
   showView("tile");
