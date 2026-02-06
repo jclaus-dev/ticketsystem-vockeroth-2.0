@@ -64,6 +64,7 @@ const currentTicketFilters = {
 };
 
 let filtersInitialized = false;
+let lastRenderedTickets = [];
 
 function updateFilterButtons(group, value) {
   const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
@@ -104,6 +105,13 @@ function initTicketFilters() {
       renderTickets();
     });
   }
+
+  const exportBtn = document.getElementById("ticketsExportBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      exportTicketsToCsv(lastRenderedTickets);
+    });
+  }
 }
 
 function updateTicketsTabLabel(openCount) {
@@ -142,6 +150,7 @@ function renderTickets() {
     return true;
   });
 
+  lastRenderedTickets = filtered.slice();
   listEl.innerHTML = "";
 
   if (!filtered.length) {
@@ -217,6 +226,79 @@ function renderTickets() {
     card.appendChild(actions);
     listEl.appendChild(card);
   });
+}
+
+function getTypeLabelFromKey(typeKey) {
+  switch (typeKey) {
+    case "zalando-bestellung":
+      return "Zalando Bestellung nicht erf\u00fcllbar";
+    case "online-gutscheine":
+      return "Online Gutscheine";
+    case "zalando-passwort":
+      return "Zalando Passwort zur\u00fccksetzen";
+    case "sonstiges":
+      return "Sonstiges Anliegen";
+    case "mboard":
+      return "Mboard Probleme";
+    default:
+      return "Andere";
+  }
+}
+
+function csvEscape(value) {
+  if (value === null || value === undefined) return "";
+  const text = String(value);
+  if (/[\"\r\n;]/.test(text)) {
+    return `"${text.replace(/\"/g, "\"\"")}"`;
+  }
+  return text;
+}
+
+function exportTicketsToCsv(tickets) {
+  if (!tickets || !tickets.length) {
+    alert("Keine Tickets zum Exportieren.");
+    return;
+  }
+
+  const header = [
+    "Datum",
+    "Status",
+    "Favorit",
+    "Typ",
+    "Ticket",
+    "Details",
+    "Personalnummer",
+    "Filialnummer",
+    "ID"
+  ].join(";");
+
+  const lines = tickets.map(ticket => {
+    const typeKey = ticket.typeKey || getTypeKeyFromName(ticket.kachelname);
+    return [
+      formatDate(ticket.createdAt),
+      ticket.done ? "Erledigt" : "Nicht erledigt",
+      ticket.isFav ? "Ja" : "Nein",
+      getTypeLabelFromKey(typeKey),
+      ticket.kachelname || "Ticket",
+      (ticket.details || "").split("|").map(s => s.trim()).filter(Boolean).join(" | "),
+      ticket.personalnummer || "",
+      ticket.filialnummer || "",
+      ticket.id || ""
+    ].map(csvEscape).join(";");
+  });
+
+  const csv = `\uFEFF${header}\n${lines.join("\n")}`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const filiale = inputs.filNr?.value.trim() || localStorage.getItem(SESSION_KEYS.filNr) || "filiale";
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `tickets_${filiale}_${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 if (buttons.homeTab) {
@@ -906,7 +988,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <div style="padding-top: 12px;">
           <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-2.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
-        <p>Schritt 3<br>
+        <p>Schritt 3<br><v
         In den Karton legen<br>
         Den verpackten Artikel mit der Sticker-Seite nach oben in eine<br>
         passende Kartonage legen.
