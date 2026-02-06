@@ -75,6 +75,9 @@ const navFilialPlaceholder = document.getElementById("filialnamePlaceholder");
 const containers = {
   tile:      document.getElementById("tileContainer"),
   tickets:   document.getElementById("containerTickets"),
+  handbuch:  document.getElementById("containerHandbuch"),
+  handbuchDetail: document.getElementById("containerHandbuchDetail"),
+  handbuchArticle: document.getElementById("containerHandbuchArticle"),
   gutschein: document.getElementById("gutscheinContainer"),
   best1:     document.getElementById("containerBestellungNichtErfuellbar"),
   step2:     document.getElementById("containerBestellungStep2"),
@@ -109,6 +112,7 @@ const inputs = {
 const buttons = {
   homeTab:        document.getElementById("homeTab"),
   ticketsTab:     document.getElementById("ticketsTab"),
+  handbuchTab:    document.getElementById("handbuchTab"),
   popupYes:       document.getElementById("popupYes"),
   popupNo:        document.getElementById("popupNo"),
   save:           document.getElementById("saveBtn"),
