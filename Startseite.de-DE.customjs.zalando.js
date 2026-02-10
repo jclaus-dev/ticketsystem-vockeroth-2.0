@@ -386,16 +386,7 @@ function buildReasonGrid1(grid, reasons, eans) {
     btn.textContent = grund;
     btn.tabIndex = 0;
     btn.style.cssText = `
-      padding: 10px;
-      font-size: 14px;
-      border: 2px solid black;
-      border-radius: 6px;
-      background: #eee;
-      cursor: pointer;
-      outline: none;
-      position: relative;
-      min-height: 60px;
-      transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+   
     `;
 
     btn.addEventListener("focus", () => {
