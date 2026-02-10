@@ -185,6 +185,129 @@ function resetZalandoFlowCompletely() {
 
 function buildReasonGrid1(grid, reasons, eans) {
   const assignments = {};
+  let lastFocusedBtn = null;
+  let needsRefocus = false;
+
+  function ensureReasonFocus() {
+    if (document.hidden) return;
+    if (!containers.opt1 || containers.opt1.style.display === "none") return;
+    const active = document.activeElement;
+    if (active && containers.opt1.contains(active)) return;
+    const target = lastFocusedBtn || grid.querySelector("button");
+    if (target) {
+      requestAnimationFrame(() => {
+        try {
+          target.focus();
+        } catch (err) {
+          // ignore focus errors (e.g. when window focus is still settling)
+        }
+        setKeyboardSelected(target);
+      });
+    }
+  }
+
+  function onWindowBlur() {
+    if (!containers.opt1 || containers.opt1.style.display === "none") return;
+    needsRefocus = true;
+  }
+
+  function onWindowFocus() {
+    if (!needsRefocus) return;
+    needsRefocus = false;
+    ensureReasonFocus();
+  }
+
+  function onContainerPointerDown(e) {
+    if (!containers.opt1 || containers.opt1.style.display === "none") return;
+    const isButton = e.target && typeof e.target.closest === "function" && e.target.closest("button");
+    if (isButton) return;
+    ensureReasonFocus();
+  }
+
+  function onAnyPointerDown(e) {
+    if (!containers.opt1 || containers.opt1.style.display === "none") return;
+    const isButton = e.target && typeof e.target.closest === "function" && e.target.closest("button");
+    if (isButton) return;
+    ensureReasonFocus();
+  }
+
+  function onDocumentKeyDown(e) {
+    if (!containers.opt1 || containers.opt1.style.display === "none") return;
+    if (!/Arrow(Left|Right)|Enter/.test(e.key)) return;
+    const active = document.activeElement;
+    if (active && grid.contains(active)) return;
+    const btns = Array.from(grid.querySelectorAll("button"));
+    if (!btns.length) return;
+    let index = lastFocusedBtn ? btns.indexOf(lastFocusedBtn) : -1;
+    if (index < 0) index = 0;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = btns[(index + 1) % btns.length];
+      lastFocusedBtn = next;
+      next.focus();
+      setKeyboardSelected(next);
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const next = btns[(index - 1 + btns.length) % btns.length];
+      lastFocusedBtn = next;
+      next.focus();
+      setKeyboardSelected(next);
+      return;
+    }
+    if (e.key === "Enter") {
+      if (isAssigned() && !buttons.confirmReason.disabled) {
+        e.preventDefault();
+        buttons.confirmReason.focus();
+        return;
+      }
+      e.preventDefault();
+      const target = btns[index];
+      lastFocusedBtn = target;
+      target.focus();
+      setKeyboardSelected(target);
+    }
+  }
+
+  if (grid._reasonFocusCleanup) {
+    grid._reasonFocusCleanup();
+  }
+  grid._reasonFocusCleanup = () => {
+    window.removeEventListener("focus", onWindowFocus);
+    window.removeEventListener("blur", onWindowBlur);
+    document.removeEventListener("visibilitychange", ensureReasonFocus);
+    if (containers.opt1) {
+      containers.opt1.removeEventListener("pointerdown", onContainerPointerDown);
+      containers.opt1.removeEventListener("mousedown", onContainerPointerDown);
+    }
+    document.removeEventListener("pointerdown", onAnyPointerDown, true);
+    document.removeEventListener("mousedown", onAnyPointerDown, true);
+    document.removeEventListener("click", onAnyPointerDown, true);
+    window.removeEventListener("pointerdown", onAnyPointerDown, true);
+    window.removeEventListener("mousedown", onAnyPointerDown, true);
+    window.removeEventListener("click", onAnyPointerDown, true);
+    document.removeEventListener("keydown", onDocumentKeyDown);
+  };
+
+  window.addEventListener("focus", () => {
+    onWindowFocus();
+    setTimeout(ensureReasonFocus, 0);
+  });
+  window.addEventListener("blur", onWindowBlur);
+  window.addEventListener("focus", ensureReasonFocus);
+  document.addEventListener("visibilitychange", ensureReasonFocus);
+  if (containers.opt1) {
+    containers.opt1.addEventListener("pointerdown", onContainerPointerDown);
+    containers.opt1.addEventListener("mousedown", onContainerPointerDown);
+  }
+  document.addEventListener("pointerdown", onAnyPointerDown, true);
+  document.addEventListener("mousedown", onAnyPointerDown, true);
+  document.addEventListener("click", onAnyPointerDown, true);
+  window.addEventListener("pointerdown", onAnyPointerDown, true);
+  window.addEventListener("mousedown", onAnyPointerDown, true);
+  window.addEventListener("click", onAnyPointerDown, true);
+  document.addEventListener("keydown", onDocumentKeyDown);
 
   function isAssigned() {
     return assignments.hasOwnProperty(eans[0]);
@@ -275,7 +398,10 @@ function buildReasonGrid1(grid, reasons, eans) {
       transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
     `;
 
-    btn.addEventListener("focus", () => btn.classList.add("keyboard-selected"));
+    btn.addEventListener("focus", () => {
+      lastFocusedBtn = btn;
+      btn.classList.add("keyboard-selected");
+    });
     btn.addEventListener("blur", () => btn.classList.remove("keyboard-selected"));
 
     btn.addEventListener("click", () => {
@@ -349,6 +475,129 @@ function buildReasonGrid2(grid, reasons, eans) {
   // allow duplicate EAN values by tracking via index keys
   const eanEntries = eans.map((ean, idx) => ({ key: `slot-${idx}`, label: ean }));
   const assignments = {}; // key -> grund
+  let lastFocusedBtn = null;
+  let needsRefocus = false;
+
+  function ensureReasonFocus() {
+    if (document.hidden) return;
+    if (!containers.opt2 || containers.opt2.style.display === "none") return;
+    const active = document.activeElement;
+    if (active && containers.opt2.contains(active)) return;
+    const target = lastFocusedBtn || grid.querySelector("button");
+    if (target) {
+      requestAnimationFrame(() => {
+        try {
+          target.focus();
+        } catch (err) {
+          // ignore focus errors (e.g. when window focus is still settling)
+        }
+        setKeyboardSelected(target);
+      });
+    }
+  }
+
+  function onWindowBlur() {
+    if (!containers.opt2 || containers.opt2.style.display === "none") return;
+    needsRefocus = true;
+  }
+
+  function onWindowFocus() {
+    if (!needsRefocus) return;
+    needsRefocus = false;
+    ensureReasonFocus();
+  }
+
+  function onContainerPointerDown(e) {
+    if (!containers.opt2 || containers.opt2.style.display === "none") return;
+    const isButton = e.target && typeof e.target.closest === "function" && e.target.closest("button");
+    if (isButton) return;
+    ensureReasonFocus();
+  }
+
+  function onAnyPointerDown(e) {
+    if (!containers.opt2 || containers.opt2.style.display === "none") return;
+    const isButton = e.target && typeof e.target.closest === "function" && e.target.closest("button");
+    if (isButton) return;
+    ensureReasonFocus();
+  }
+
+  function onDocumentKeyDown(e) {
+    if (!containers.opt2 || containers.opt2.style.display === "none") return;
+    if (!/Arrow(Left|Right)|Enter/.test(e.key)) return;
+    const active = document.activeElement;
+    if (active && grid.contains(active)) return;
+    const btns = Array.from(grid.querySelectorAll("button"));
+    if (!btns.length) return;
+    let index = lastFocusedBtn ? btns.indexOf(lastFocusedBtn) : -1;
+    if (index < 0) index = 0;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = btns[(index + 1) % btns.length];
+      lastFocusedBtn = next;
+      next.focus();
+      setKeyboardSelected(next);
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const next = btns[(index - 1 + btns.length) % btns.length];
+      lastFocusedBtn = next;
+      next.focus();
+      setKeyboardSelected(next);
+      return;
+    }
+    if (e.key === "Enter") {
+      if (totalAssigned() === eanEntries.length && !buttons.confirmReason2.disabled) {
+        e.preventDefault();
+        buttons.confirmReason2.focus();
+        return;
+      }
+      e.preventDefault();
+      const target = btns[index];
+      lastFocusedBtn = target;
+      target.focus();
+      setKeyboardSelected(target);
+    }
+  }
+
+  if (grid._reasonFocusCleanup) {
+    grid._reasonFocusCleanup();
+  }
+  grid._reasonFocusCleanup = () => {
+    window.removeEventListener("focus", onWindowFocus);
+    window.removeEventListener("blur", onWindowBlur);
+    document.removeEventListener("visibilitychange", ensureReasonFocus);
+    if (containers.opt2) {
+      containers.opt2.removeEventListener("pointerdown", onContainerPointerDown);
+      containers.opt2.removeEventListener("mousedown", onContainerPointerDown);
+    }
+    document.removeEventListener("pointerdown", onAnyPointerDown, true);
+    document.removeEventListener("mousedown", onAnyPointerDown, true);
+    document.removeEventListener("click", onAnyPointerDown, true);
+    window.removeEventListener("pointerdown", onAnyPointerDown, true);
+    window.removeEventListener("mousedown", onAnyPointerDown, true);
+    window.removeEventListener("click", onAnyPointerDown, true);
+    document.removeEventListener("keydown", onDocumentKeyDown);
+  };
+
+  window.addEventListener("focus", () => {
+    onWindowFocus();
+    setTimeout(ensureReasonFocus, 0);
+  });
+  window.addEventListener("blur", onWindowBlur);
+  window.addEventListener("focus", ensureReasonFocus);
+  document.addEventListener("visibilitychange", ensureReasonFocus);
+  if (containers.opt2) {
+    containers.opt2.addEventListener("pointerdown", onContainerPointerDown);
+    containers.opt2.addEventListener("mousedown", onContainerPointerDown);
+  }
+  document.addEventListener("pointerdown", onAnyPointerDown, true);
+  document.addEventListener("mousedown", onAnyPointerDown, true);
+  document.addEventListener("click", onAnyPointerDown, true);
+  window.addEventListener("pointerdown", onAnyPointerDown, true);
+  window.addEventListener("mousedown", onAnyPointerDown, true);
+  window.addEventListener("click", onAnyPointerDown, true);
+  document.addEventListener("keydown", onDocumentKeyDown);
 
   function totalAssigned() {
     return Object.keys(assignments).length;
@@ -452,7 +701,10 @@ function buildReasonGrid2(grid, reasons, eans) {
       transition: transform 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
     `;
 
-    btn.addEventListener("focus", () => btn.classList.add("keyboard-selected"));
+    btn.addEventListener("focus", () => {
+      lastFocusedBtn = btn;
+      btn.classList.add("keyboard-selected");
+    });
     btn.addEventListener("blur", () => btn.classList.remove("keyboard-selected"));
 
     btn.addEventListener("click", () => {
@@ -556,3 +808,14 @@ async function sendZalandoTicket({ kachelname, orderId, eans = [], reasons = [],
     hasSent = false;
   }
 }
+  function setKeyboardSelected(target) {
+    Array.from(grid.querySelectorAll("button")).forEach(btn => {
+      btn.classList.toggle("keyboard-selected", btn === target);
+    });
+  }
+
+  function setKeyboardSelected(target) {
+    Array.from(grid.querySelectorAll("button")).forEach(btn => {
+      btn.classList.toggle("keyboard-selected", btn === target);
+    });
+  }
