@@ -64,6 +64,7 @@ const currentTicketFilters = {
 };
 
 let filtersInitialized = false;
+let lastRenderedTickets = [];
 
 function updateFilterButtons(group, value) {
   const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
@@ -104,6 +105,13 @@ function initTicketFilters() {
       renderTickets();
     });
   }
+
+  const exportBtn = document.getElementById("ticketsExportBtn");
+  if (exportBtn) {
+    exportBtn.addEventListener("click", () => {
+      exportTicketsToCsv(lastRenderedTickets);
+    });
+  }
 }
 
 function updateTicketsTabLabel(openCount) {
@@ -142,6 +150,7 @@ function renderTickets() {
     return true;
   });
 
+  lastRenderedTickets = filtered.slice();
   listEl.innerHTML = "";
 
   if (!filtered.length) {
@@ -219,6 +228,79 @@ function renderTickets() {
   });
 }
 
+function getTypeLabelFromKey(typeKey) {
+  switch (typeKey) {
+    case "zalando-bestellung":
+      return "Zalando Bestellung nicht erf\u00fcllbar";
+    case "online-gutscheine":
+      return "Online Gutscheine";
+    case "zalando-passwort":
+      return "Zalando Passwort zur\u00fccksetzen";
+    case "sonstiges":
+      return "Sonstiges Anliegen";
+    case "mboard":
+      return "Mboard Probleme";
+    default:
+      return "Andere";
+  }
+}
+
+function csvEscape(value) {
+  if (value === null || value === undefined) return "";
+  const text = String(value);
+  if (/[\"\r\n;]/.test(text)) {
+    return `"${text.replace(/\"/g, "\"\"")}"`;
+  }
+  return text;
+}
+
+function exportTicketsToCsv(tickets) {
+  if (!tickets || !tickets.length) {
+    alert("Keine Tickets zum Exportieren.");
+    return;
+  }
+
+  const header = [
+    "Datum",
+    "Status",
+    "Favorit",
+    "Typ",
+    "Ticket",
+    "Details",
+    "Personalnummer",
+    "Filialnummer",
+    "ID"
+  ].join(";");
+
+  const lines = tickets.map(ticket => {
+    const typeKey = ticket.typeKey || getTypeKeyFromName(ticket.kachelname);
+    return [
+      formatDate(ticket.createdAt),
+      ticket.done ? "Erledigt" : "Nicht erledigt",
+      ticket.isFav ? "Ja" : "Nein",
+      getTypeLabelFromKey(typeKey),
+      ticket.kachelname || "Ticket",
+      (ticket.details || "").split("|").map(s => s.trim()).filter(Boolean).join(" | "),
+      ticket.personalnummer || "",
+      ticket.filialnummer || "",
+      ticket.id || ""
+    ].map(csvEscape).join(";");
+  });
+
+  const csv = `\uFEFF${header}\n${lines.join("\n")}`;
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const filiale = inputs.filNr?.value.trim() || localStorage.getItem(SESSION_KEYS.filNr) || "filiale";
+  const date = new Date().toISOString().slice(0, 10);
+  link.href = url;
+  link.download = `tickets_${filiale}_${date}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 if (buttons.homeTab) {
   buttons.homeTab.addEventListener("click", () => showView("tile"));
 }
@@ -236,6 +318,10 @@ if (buttons.handbuchTab) {
     showView("handbuch");
   });
 }
+
+const initialTickets = loadTickets();
+const initialOpenCount = initialTickets.filter(t => !t.done).length;
+updateTicketsTabLabel(initialOpenCount);
 
 const HANDBUCH_DATA = {
   mboard: {
@@ -587,7 +673,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <p>Neues Browser Fenster &ouml;ffnen und auf den M-Board Button klicken. Bei Anmeldung bitte Organisation &bdquo;Vockeroth&ldquo; eingeben. Bitte mit Fortfahren best&auml;tigen.</p>
         <p>Nun sind E-Mail-Adresse und Passwort gefragt. Bitte in das Feld E-Mail-Adresse klicken und die entsprechende E-Mail-Adresse ausw&auml;hlen. Das Passwort ist gespeichert und wird automatisch ausgef&uuml;llt. Falls nicht, bitte erneut ins Feld klicken und die Anmelde-E-Mail ausw&auml;hlen. Bitte mit Fortfahren best&auml;tigen.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Anmelden im M-Board.png" alt="M-Board Anmeldung" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Anmelden im M-Board.png" alt="M-Board Anmeldung" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -596,7 +682,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <p>Um Picklisten nachzudrucken, klickt man auf den ersten Button auf der oberen rechten Seite.</p>
         <p>Dieser Button wird gr&uuml;n, wenn die Pickliste gedruckt wurde. Ist der Button wei&szlig;, wurde noch keine Pickliste gedruckt.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Pickliste nachdrucken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Pickliste nachdrucken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -605,7 +691,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <p>Um Bestellungen zu melden, klickt Ihr den roten &bdquo;Melden&ldquo; Button auf der rechten Seite. M-Board Bestellungen werden ausschlie&szlig;lich im M-Board gemeldet!</p>
         <p>Wenn eine Bestellung gemeldet wurde, verschwindet diese aus euren offenen Bestellungen.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Bestellung melden.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Bestellung melden.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -619,7 +705,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         Das hilft auch in Fällen, in denen ihr eine Bestellung nicht sofort
         findet.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Aktualisieren.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Aktualisieren.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -633,7 +719,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
           <li>interne Updates oder wichtige Hinweise.</li>
         </ul>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Neuigkeiten im M-Board.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Neuigkeiten im M-Board.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -642,7 +728,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
        <p>Reservierungen werden separat im M-Board angezeigt mit dem Status
           “Angekündigt”. Bitte nutzt hierfür den Reiter “Angekündigt”.</p>
           <div style="padding-top: 12px;">
-            <img src="../../web-files/Handbuch_images/M-Board_Reservierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+            <img src="web-files/Handbuch_images/M-Board_Reservierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
           </div
           <p>Druckt die Pickliste und drückt den “Picken” Button für das
           Zurücklegen der Ware
@@ -663,7 +749,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <p>Bitte in das Feld E-Mail-Adresse klicken und die entsprechende E-MailAdresse auswählen. Das Passwort ist gespeichert und wird automatisch
         ausgefüllt. Falls nicht, bitte erneut ins Feld klicken und die Anmelde-EMail auswählen. Zum Schluss “Bestätigen” klicken.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Anmeldung.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Anmeldung.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -683,7 +769,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         Wenn links ein kleiner grüner Haken erscheint, wurde die Pickliste bereits
         gedruckt.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Bestellungen nachdrucken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Bestellungen nachdrucken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -703,7 +789,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         gemeldeten Anfragen bearbeiten und kein weiterer Bestand für die
         jeweilige Bestellung verfügbar ist.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Stornierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Stornierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -713,7 +799,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <p>Sollte kein Bestand vorhanden sein, übernimmt das Online‑Team die
         Prüfung und stellt die Bestellung entsprechend auf „Nicht verfügbar“.</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Stornierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Stornierungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `,
@@ -724,20 +810,20 @@ const HANDBUCH_ARTICLE_CONTENT = {
         Solltet ihr eine Retoure bekommen, die nicht von eurer Filiale versendet
         wurde, meldet dies bitte an folgende E‑Mail‑Adresse: onlinevockeroth@vockeroth.com</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Retouren.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Retouren.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
         <p><br>2. Wenn ihr auf „Retourenmeldung erstellen“ klickt, müsst ihr anschließend
         einen Rückgabegrund auswählen. Dieser steht auf dem Retourenschein.<p>
         Hat der Kunde keinen Grund angegeben, wählt bitte „Kein Grund
         verfügbar“</p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Retouren-2.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Retouren-2.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
         <p><br>3. Zum Schluss ist es wichtig, dass ihr auf den Button
         „Retourenbestätigung“ klickt. Ohne diesen Schritt wird die Retoure nicht
         verbucht.<p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/M-Board_Retouren-3.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/M-Board_Retouren-3.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div>
       </div>
     `
@@ -799,7 +885,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         ordnungsgemäß am Abend abgeschlossen werden.<p>
       </div>
       <div style="padding-top: 12px;">
-        <img src="../../web-files/Handbuch_images/M-Board_Abschließeen der Bestellungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+        <img src="web-files/Handbuch_images/M-Board_Abschließeen der Bestellungen.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
       </div>
     `
   },
@@ -815,7 +901,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         bestellen.</li>
       </div>
       <div style="padding-top: 12px;">
-        <img src="../../web-files/Handbuch_images/Irics_Online_gesperrt.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+        <img src="web-files/Handbuch_images/Irics_Online_gesperrt.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
       </div>
     `,
     "Letztes Update": `
@@ -827,7 +913,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         stattgefunden hat.<p>
       </div>
       <div style="padding-top: 12px;">
-        <img src="../../web-files/Handbuch_images/Irics_Letztes_Update.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+        <img src="web-files/Handbuch_images/Irics_Letztes_Update.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
       </div>
     `,
     "WE nicht erfasst": `
@@ -843,7 +929,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         korrekt erfasst werden.</li>
       </div>
       <div style="padding-top: 12px;">
-        <img src="../../web-files/Handbuch_images/Irics_WE_nicht_erfasst.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+        <img src="web-files/Handbuch_images/Irics_WE_nicht_erfasst.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
       </div>
     `
   },
@@ -884,7 +970,7 @@ const HANDBUCH_ARTICLE_CONTENT = {
         <li>Vockeroth-Karte</li><br>
       </div>
       <div style="padding-top: 12px;">
-        <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Priorisierung und Verpackung.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+        <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Priorisierung und Verpackung.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
       </div>
     `,
     "Vorgehen beim Verpacken": `
@@ -894,31 +980,31 @@ const HANDBUCH_ARTICLE_CONTENT = {
         Wenn möglich, Artikel in A4 Format falten<br>
         Den/die Artikel ordentlich in Seidenpapier falten.<p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-1.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-1.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
         <p>Schritt 2:<br>
         Verpackung verschließen<br>
         Offene Seite des Seidenpapiers mit einem Sticker verschließen.<p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
         <p>Verpackten Artikel einmal drehen<p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-2.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-2.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
-        <p>Schritt 3<br>
+        <p>Schritt 3<br><v
         In den Karton legen<br>
         Den verpackten Artikel mit der Sticker-Seite nach oben in eine<br>
         passende Kartonage legen.
         <p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-3.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-3.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
         <p>Schritt 4:<br>
         Vockeroth-Karte dazulegen
         <p>
         <div style="padding-top: 12px;">
-          <img src="../../web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-4.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
+          <img src="web-files/Handbuch_images/Onlineshop-Bestellungen_Vorgehen beim Verpacken-4.png" alt="Picklisten nachdrucken" style="max-width: 100%; border-radius: 10px; border: 1px solid #e6e6e6; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);" />
         </div><br>
         <span style="text-decoration: underline;">WICHTIG:</span><br>
         <span>Geht euch das Material leer, dann schreibt eine E-Mail an:

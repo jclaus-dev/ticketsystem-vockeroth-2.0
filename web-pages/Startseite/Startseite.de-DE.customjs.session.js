@@ -75,6 +75,10 @@ buttons.save.addEventListener("click", () => {
   enableAllTiles();
   if (buttons.ticketsTab) buttons.ticketsTab.disabled = false;
   if (buttons.handbuchTab) buttons.handbuchTab.disabled = false;
+  if (typeof loadTickets === "function" && typeof updateTicketsTabLabel === "function") {
+    const openCount = loadTickets().filter(t => !t.done).length;
+    updateTicketsTabLabel(openCount);
+  }
   document.getElementById("savedNotice").style.display = "block";
   setTimeout(() => document.getElementById("savedNotice").style.display = "none", 4000);
   showView("tile");
