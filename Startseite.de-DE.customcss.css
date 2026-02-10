@@ -1,12 +1,17 @@
 /* Grundlayout */
 body {
   overflow-x: hidden !important;
+  overflow-y: hidden !important;
   margin: 0;
   background-color: #788f78 !important;
+}
+html {
+  overflow: hidden !important;
 }
 .page-wrapper {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 .center-content {
   flex: 1 1 auto !important;
@@ -16,6 +21,15 @@ body {
   align-items: center;
   justify-content: flex-start;
   padding-top: 40px;
+}
+.footer-contact {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+  padding-bottom: 18px;
 }
 
 /* Info-Banner */
@@ -196,7 +210,19 @@ body {
   font-size: 18px;
 }
 #nextArrow {
-  width: 60px;
+    height: 45px;
+      width: 100%;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #000;
+      border-radius: 6px;
+      background: transparent !important;
+      box-sizing: border-box;
+      text-align: center;
+      line-height: 1;
+ 
 /*height: 60px; */
   background: center/contain no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234caf50' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='9 18 15 12 9 6'/></svg>");
   cursor: pointer;
@@ -222,11 +248,65 @@ body {
   border-radius: 6px;
   margin-bottom: 10px;
 }
+#step2Confirm,
+.arrow-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: auto;
+  background: transparent;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+.arrow-controls button {
+  height: 45px;
+  width: 140px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #000 !important;
+  border-radius: 6px;
+  background: transparent !important;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1;
+  color: #111;
+}
+.arrow-controls button[id$="Prev"],
+.arrow-controls button[id$="Prev1"],
+.arrow-controls button#backBtn,
+.arrow-controls button#zalandoPrev {
+  width: 30%;
+}
+.arrow-controls button[id$="Confirm"],
+.arrow-controls button#arrowNext,
+.arrow-controls button#nextArrow,
+.arrow-controls button#step2Confirm,
+.arrow-controls button#confirmReasonBtn,
+.arrow-controls button#confirmReasonBtn2,
+.arrow-controls button#passwordConfirm,
+.arrow-controls button#sonstigesConfirm,
+.arrow-controls button#mboardConfirm,
+.arrow-controls button#mboardRetoureConfirm {
+  width: 70%;
+}
+.arrow-controls button[style*="color: green"],
+.arrow-controls button[style*="color: #4caf50"],
+.arrow-controls button[style*="color:#4caf50"],
+.arrow-controls button[style*="color: rgb(76, 175, 80)"] {
+  border-color: green !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
 #step2Confirm {
-  padding: 10px 20px;
-  background: #4caf50;
+  background: green;
   color: white;
-  border: none;
+  border: 2px solid #000;
   border-radius: 6px;
   cursor: pointer;
 }

@@ -319,6 +319,10 @@ if (buttons.handbuchTab) {
   });
 }
 
+const initialTickets = loadTickets();
+const initialOpenCount = initialTickets.filter(t => !t.done).length;
+updateTicketsTabLabel(initialOpenCount);
+
 const HANDBUCH_DATA = {
   mboard: {
     title: "M-board",

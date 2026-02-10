@@ -129,7 +129,7 @@
         font-size: 16px;
         border-radius: 6px;
         cursor: pointer;
-        margin-top: 25.9px;
+        margin-top: 23.5px;
       }
 
       #resetBtn {
@@ -816,10 +816,10 @@
           <div id="sendeBestaetigung" class="gutschein-confirmation"
             style="background-image: initial; background-position-x: initial; background-position-y: initial; background-size: initial; background-repeat: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: rgb(76, 175, 80); color: white; padding-top: 15px; padding-right: 25px; padding-bottom: 15px; padding-left: 25px; border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; display: none; margin-top: 20px;">
             ✅ Gutscheincode erfolgreich gesendet!</div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px; margin: 10px 0;"><button
+          <div class="arrow-controls" style="margin: 10px 0;"><button
               id="arrowPrev" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button><button id="arrowNext"
-              type="button" style="font-size: 80px; background: none; border: none; cursor: pointer;">→</button></div>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button><button id="arrowNext"
+              type="button" style="font-size: 40px; background: none; border: none; cursor: pointer;">→</button></div>
     
         </div>
         <!-- Popup -->
@@ -836,7 +836,7 @@
         <div id="containerBestellungNichtErfuellbar" class="gutschein-container"
           style="row-gap: 20px; column-gap: 20px; margin-top: 20px; margin-right: auto; margin-bottom: 0px; margin-left: auto; display: none; flex-direction: column; align-items: center; gap: 20px; margin: 20px auto; width: 100%; max-width: 1440px;">
           <h2 style="color: white;">Gebe die Order-ID ein:</h2>
-          <span style="color: white;">(Beispiel: 10103511225937)</span>
+          <p style="color: white;">(Beispiel: 10103511225937)</p>
     
           <div id="box1" class="code-box"
             style="border: 2px solid black; display: flex; align-items: center; justify-content: center; border-radius: 6px; width: 400px; height: 100px;">
@@ -844,12 +844,11 @@
               style="font-size: 18px; width: 90%; text-align: center; border: none;" />
           </div>
     
-          <div class="arrow-controls"
-            style="display: flex; justify-content: center; align-items: center; gap: 40px; width: 100%;">
+          <div class="arrow-controls">
             <button id="zalandoPrev" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button>
             <button id="nextArrow" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer; color: white;">→</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer; color: white;">→</button>
               <div></div>
           </div>
         </div>
@@ -896,11 +895,11 @@
 
     
           <!-- Pfeilsteuerung -->
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px;">
+          <div class="arrow-controls">
             <button id="backBtn" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button>
             <button id="step2Confirm" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer; color: white;">→</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer; color: white;">→</button>
           </div>
         </div>
     
@@ -914,11 +913,11 @@
           </div>
     
           <!-- Neuer Pfeil-Button -->
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px; justify-content: center; margin-top: 20px;">
+          <div class="arrow-controls" style="margin-top: 20px;">
             <button id="reasonPrev1" type="button"
-              style="font-size: 60px; background: none; border: none; cursor: pointer;">&#8592;</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">&#8592;</button>
             <button id="confirmReasonBtn" type="button"
-              style="font-size: 60px; border: none; background: none; color: white; cursor: pointer;">→</button>
+              style="font-size: 40px; border: none; background: none; color: white; cursor: pointer;">→</button>
           </div>
         </div>
     
@@ -931,7 +930,7 @@
           </div>
     
           <!-- Neuer Pfeil-Button -->
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px; justify-content: center; margin-top: 20px;">
+          <div class="arrow-controls" style="margin-top: 20px;">
             <button id="reasonPrev2" type="button"
               style="font-size: 60px; background: none; border: none; cursor: pointer;">&#8592;</button>
             <button id="confirmReasonBtn2" type="button"
@@ -954,9 +953,9 @@
           <div data-reason="Sonstiges" class="tile clickable passwort-reason"
             style="flex-grow: 0; flex-shrink: 0; flex-basis: 450px; height: 230px; background-image: initial; background-position-x: initial; background-position-y: initial; background-size: initial; background-repeat: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: rgb(242, 242, 242); border-top-left-radius: 8px; border-top-right-radius: 8px; border-bottom-right-radius: 8px; border-bottom-left-radius: 8px; text-align: center; padding-top: 30px; padding-right: 20px; padding-bottom: 30px; padding-left: 20px; box-shadow: rgba(0, 0, 0, 0.15) 0px 6px 12px; transition-behavior: normal; transition-duration: 0.2s; transition-timing-function: ease; transition-delay: 0s; transition-property: transform; display: flex; flex-direction: column; justify-content: center; align-items: center; color: rgb(17, 17, 17); cursor: pointer;">
             Sonstiges</div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px; flex-basis: 100%; justify-content: center; margin-top: 20px;">
+          <div class="arrow-controls" style="flex-basis: 100%; margin-top: 20px;">
             <button id="passwordPrev1" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">&#8592;</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">&#8592;</button>
           </div>
         </div>
         <div id="containerPasswortResetStep2" class="gutschein-container"
@@ -968,10 +967,10 @@
             <input id="newPasswordInput" placeholder="Neues Passwort"
               style="padding-top: 10px; padding-right: 10px; padding-bottom: 10px; padding-left: 10px; border-top-width: initial; border-right-width: initial; border-bottom-width: initial; border-left-width: initial; border-top-style: none; border-right-style: none; border-bottom-style: none; border-left-style: none; border-top-color: initial; border-right-color: initial; border-bottom-color: initial; border-left-color: initial; border-image-source: initial; border-image-slice: initial; border-image-width: initial; border-image-outset: initial; border-image-repeat: initial; background-image: none; background-position-x: initial; background-position-y: initial; background-size: initial; background-repeat: initial; background-attachment: initial; background-origin: initial; background-clip: initial; background-color: initial; outline-color: initial; outline-style: none; outline-width: initial; font-size: 18px; width: 90%; text-align: center;" />
           </div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px;"><button id="passwordPrev"
-              type="button" style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button><button
+          <div class="arrow-controls"><button id="passwordPrev"
+              type="button" style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button><button
               id="passwordConfirm" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">→</button></div>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">→</button></div>
         </div>
         <!-- Sonstiges Anliegen -->
         <div id="containerSonstiges" class="gutschein-container"
@@ -981,10 +980,10 @@
             style="border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-style: solid; border-right-style: solid; border-bottom-style: solid; border-left-style: solid; border-top-color: black; border-right-color: black; border-bottom-color: black; border-left-color: black; border-image-source: initial; border-image-slice: initial; border-image-width: initial; border-image-outset: initial; border-image-repeat: initial; display: flex; align-items: center; justify-content: center; border-top-left-radius: 6px; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border-bottom-left-radius: 6px; width: 400px; height: 100px;">
             <input id="sonstigesInput" placeholder="Ihr Anliegen"
               style="font-size: 18px; width: 90%; height: 80px; padding: 10px;"></input></div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px;"><button id="sonstigesPrev"
-              type="button" style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button><button
+          <div class="arrow-controls"><button id="sonstigesPrev"
+              type="button" style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button><button
               id="sonstigesConfirm" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">→</button></div>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">→</button></div>
         </div>
         <!-- Mboard Eingabe-Container -->
         <div id="containerMboard" class="gutschein-container"
@@ -995,11 +994,11 @@
             <input id="mboardInput" placeholder="Dein Mboard-Problem"
               style="font-size: 18px; width: 90%; height: 80px; padding: 10px;">
           </div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px;">
+          <div class="arrow-controls">
             <button id="mboardPrev" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">←</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">←</button>
             <button id="mboardConfirm" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">→</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">→</button>
           </div>
         </div>
 
@@ -1026,11 +1025,11 @@
             <input id="mboardRetoureState" type="text" placeholder="Zustand" data-keep-placeholder="true"
               style="font-size: 18px; width: 90%; text-align: center; border: none;">
           </div>
-          <div class="arrow-controls" style="display: flex; align-items: center; gap: 40px;">
+          <div class="arrow-controls">
             <button id="mboardRetourePrev" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer;">&#8592;</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer;">&#8592;</button>
             <button id="mboardRetoureConfirm" type="button"
-              style="font-size: 80px; background: none; border: none; cursor: pointer; color: white;">&#8594;</button>
+              style="font-size: 40px; background: none; border: none; cursor: pointer; color: white;">&#8594;</button>
           </div>
         </div>
 

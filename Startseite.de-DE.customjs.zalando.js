@@ -377,7 +377,7 @@ function buildReasonGrid1(grid, reasons, eans) {
 
   grid.innerHTML = "";
   buttons.confirmReason.disabled = true;
-  buttons.confirmReason.style.display = "inline-block";
+  buttons.confirmReason.style.display = "inline-flex";
   buttons.confirmReason.style.color = "white";
   buttons.confirmReason.style.cursor = "not-allowed";
 
@@ -680,7 +680,7 @@ function buildReasonGrid2(grid, reasons, eans) {
 
   grid.innerHTML = "";
   buttons.confirmReason2.disabled = true;
-  buttons.confirmReason2.style.display = "inline-block";
+  buttons.confirmReason2.style.display = "inline-flex";
   buttons.confirmReason2.style.color = "white";
   buttons.confirmReason2.style.cursor = "not-allowed";
 
