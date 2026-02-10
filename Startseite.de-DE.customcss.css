@@ -568,6 +568,20 @@ button#confirmReason2:enabled {
   border: none !important;              /* schwarzen Rahmen entfernen */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);  /* optional: leichter Schatten */
 }
+/* Passwort-Optionen: Wenn Keyboard aktiv ist, Hover nicht zusätzlich highlighten */
+#containerPasswortResetStep1[data-input-mode="keyboard"] .passwort-reason:hover {
+  transform: none !important;
+  z-index: auto;
+  border: none !important;
+  box-shadow: none !important;
+}
+#containerPasswortResetStep1[data-input-mode="keyboard"] .passwort-reason.keyboard-selected {
+  transform: scale(1.10) !important;
+  z-index: 2;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+/* Passwort-Optionen: Hover nicht doppelt highlighten, Auswahl läuft über keyboard-selected */
 
 /* 3) „Coming Soon“-Kacheln bleiben ausgegraut und nicht fokussierbar */
 .tile[data-kachelname="Coming Soon"] {
