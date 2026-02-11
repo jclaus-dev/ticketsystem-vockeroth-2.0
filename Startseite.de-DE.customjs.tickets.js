@@ -65,6 +65,42 @@ const currentTicketFilters = {
 
 let filtersInitialized = false;
 let lastRenderedTickets = [];
+let deleteModeActive = false;
+const selectedTicketIds = new Set();
+
+function updateDeleteButtonState() {
+  const deleteBtn = document.getElementById("ticketsDeleteBtn");
+  if (!deleteBtn) return;
+  deleteBtn.textContent = deleteModeActive ? "Bestätigen" : "Löschen";
+  deleteBtn.classList.toggle("is-confirm", deleteModeActive);
+}
+
+function clearDeleteSelection() {
+  selectedTicketIds.clear();
+}
+
+function handleDeleteModeButtonClick() {
+  if (!deleteModeActive) {
+    deleteModeActive = true;
+    clearDeleteSelection();
+    updateDeleteButtonState();
+    renderTickets();
+    return;
+  }
+
+  if (!selectedTicketIds.size) {
+    alert("Bitte zuerst mindestens ein Ticket auswählen.");
+    return;
+  }
+
+  const all = loadTickets();
+  const remaining = all.filter(ticket => !selectedTicketIds.has(ticket.id));
+  saveTickets(remaining);
+  deleteModeActive = false;
+  clearDeleteSelection();
+  updateDeleteButtonState();
+  renderTickets();
+}
 
 function updateFilterButtons(group, value) {
   const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
@@ -112,6 +148,12 @@ function initTicketFilters() {
       exportTicketsToCsv(lastRenderedTickets);
     });
   }
+
+  const deleteBtn = document.getElementById("ticketsDeleteBtn");
+  if (deleteBtn) {
+    updateDeleteButtonState();
+    deleteBtn.addEventListener("click", handleDeleteModeButtonClick);
+  }
 }
 
 function updateTicketsTabLabel(openCount) {
@@ -150,6 +192,11 @@ function renderTickets() {
     return true;
   });
 
+  const existingIds = new Set(tickets.map(ticket => ticket.id));
+  Array.from(selectedTicketIds).forEach(id => {
+    if (!existingIds.has(id)) selectedTicketIds.delete(id);
+  });
+
   lastRenderedTickets = filtered.slice();
   listEl.innerHTML = "";
 
@@ -164,6 +211,8 @@ function renderTickets() {
     card.className = `ticket-card${ticket.done ? " done" : ""} is-animated`;
     card.style.animationDelay = `${Math.min(200 * idx, 800)}ms`;
     card.dataset.id = ticket.id;
+    if (deleteModeActive) card.classList.add("is-delete-mode");
+    if (selectedTicketIds.has(ticket.id)) card.classList.add("is-delete-selected");
 
     const info = document.createElement("div");
     info.className = "ticket-info";
@@ -221,6 +270,19 @@ function renderTickets() {
     });
     actions.appendChild(toggleBtn);
     actions.appendChild(fav);
+
+    if (deleteModeActive) {
+      card.addEventListener("click", evt => {
+        if (evt.target.closest(".ticket-actions")) return;
+        if (selectedTicketIds.has(ticket.id)) {
+          selectedTicketIds.delete(ticket.id);
+          card.classList.remove("is-delete-selected");
+        } else {
+          selectedTicketIds.add(ticket.id);
+          card.classList.add("is-delete-selected");
+        }
+      });
+    }
 
     card.appendChild(info);
     card.appendChild(actions);

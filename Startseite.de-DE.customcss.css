@@ -729,6 +729,20 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   transform: translateY(-1px);
 }
 
+.ticket-delete-button {
+  background: #b01717;
+  border-color: #7f1111;
+  color: #fff;
+}
+
+.ticket-delete-button:hover {
+  box-shadow: 0 3px 8px rgba(176, 23, 23, 0.35);
+}
+
+.ticket-delete-button.is-confirm {
+  background: #7f1111;
+}
+
 .tickets-list {
   display: flex;
   flex-direction: column;
@@ -755,6 +769,21 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   width: 100%;
   box-sizing: border-box;
   position: relative;
+}
+
+.ticket-card.is-delete-mode {
+  cursor: pointer;
+}
+
+.ticket-card.is-delete-selected {
+  background: #ffd7d7;
+  border-color: #b01717;
+}
+
+.ticket-card.is-delete-selected .ticket-title,
+.ticket-card.is-delete-selected .ticket-meta,
+.ticket-card.is-delete-selected .ticket-details-list {
+  color: #4a0909;
 }
 
 .ticket-card.done {
