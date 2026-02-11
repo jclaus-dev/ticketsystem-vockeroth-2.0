@@ -27,14 +27,19 @@ function showView(name) {
   if (containers[name]) containers[name].style.display = "flex";
 
   if (buttons.homeTab && buttons.ticketsTab) {
+    const isHome = name === "tile";
     const isTickets = name === "tickets";
-    buttons.homeTab.classList.toggle("is-active", !isTickets);
+    const isHandbuch = name === "handbuch" || name === "handbuchDetail" || name === "handbuchArticle";
+    buttons.homeTab.classList.toggle("is-active", isHome);
     buttons.ticketsTab.classList.toggle("is-active", isTickets);
+    if (buttons.handbuchTab) {
+      buttons.handbuchTab.classList.toggle("is-active", isHandbuch);
+    }
   }
 
-  if (name === "tile" || name === "tickets") {
+  if (name === "tile" || name === "tickets" || name === "handbuch" || name === "handbuchDetail" || name === "handbuchArticle") {
     if (userFieldsWrapper) userFieldsWrapper.style.display = "flex";
-    if (userFields) userFields.style.display = name === "tickets" ? "none" : "flex";
+    if (userFields) userFields.style.display = name === "tile" ? "flex" : "none";
 
     if (name === "tile") {
       if (!inputs.persNr.value.trim()) {

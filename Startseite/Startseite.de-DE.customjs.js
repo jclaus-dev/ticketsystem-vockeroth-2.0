@@ -40,6 +40,10 @@ function initializeApp() {
   if (savedFil)  inputs.filNr.value  = savedFil;
   updateFilialPlaceholder();
   validatePersonalFilial();
+  if (typeof loadTickets === "function" && typeof updateTicketsTabLabel === "function") {
+    const openCount = loadTickets().filter(t => !t.done).length;
+    updateTicketsTabLabel(openCount);
+  }
 
   if (!inputs.persNr.value.trim()) {
     inputs.persNr.focus();

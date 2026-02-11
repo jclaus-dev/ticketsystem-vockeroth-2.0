@@ -4,18 +4,33 @@ body {
   margin: 0;
   background-color: #788f78 !important;
 }
+html, body {
+  height: 100%;
+}
 .page-wrapper {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
+  height: 100vh;
 }
 .center-content {
   flex: 1 1 auto !important;
-  overflow-y: auto !important;
+  overflow-y: visible !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding-top: 40px;
+  padding-bottom: 90px;
+}
+.footer-contact {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 10;
+  padding-bottom: 18px;
 }
 
 /* Info-Banner */
@@ -196,7 +211,19 @@ body {
   font-size: 18px;
 }
 #nextArrow {
-  width: 60px;
+    height: 45px;
+      width: 100%;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #000;
+      border-radius: 6px;
+      background: transparent !important;
+      box-sizing: border-box;
+      text-align: center;
+      line-height: 1;
+ 
 /*height: 60px; */
   background: center/contain no-repeat url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234caf50' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='9 18 15 12 9 6'/></svg>");
   cursor: pointer;
@@ -222,11 +249,72 @@ body {
   border-radius: 6px;
   margin-bottom: 10px;
 }
+#step2Confirm,
+.arrow-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: auto;
+  background: transparent;
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+}
+.arrow-controls button {
+  height: 45px;
+  width: 140px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #000 !important;
+  border-radius: 6px;
+  background: transparent !important;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 1;
+  color: #111;
+  outline: none;
+  box-shadow: none;
+}
+.arrow-controls button:focus,
+.arrow-controls button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.arrow-controls button[id$="Prev"],
+.arrow-controls button[id$="Prev1"],
+.arrow-controls button#backBtn,
+.arrow-controls button#zalandoPrev {
+  width: 30%;
+}
+.arrow-controls button[id$="Confirm"],
+.arrow-controls button#arrowNext,
+.arrow-controls button#nextArrow,
+.arrow-controls button#step2Confirm,
+.arrow-controls button#confirmReasonBtn,
+.arrow-controls button#confirmReasonBtn2,
+.arrow-controls button#passwordConfirm,
+.arrow-controls button#sonstigesConfirm,
+.arrow-controls button#mboardConfirm,
+.arrow-controls button#mboardRetoureConfirm {
+  width: 70%;
+}
+.arrow-controls button[style*="color: green"],
+.arrow-controls button[style*="color: #4caf50"],
+.arrow-controls button[style*="color:#4caf50"],
+.arrow-controls button[style*="color: rgb(76, 175, 80)"] {
+  border-color: green !important;
+  border-width: 2px !important;
+  border-style: solid !important;
+}
 #step2Confirm {
-  padding: 10px 20px;
-  background: #4caf50;
+  background: green;
   color: white;
-  border: none;
+  border: 2px solid #000;
   border-radius: 6px;
   cursor: pointer;
 }
@@ -480,6 +568,20 @@ button#confirmReason2:enabled {
   border: none !important;              /* schwarzen Rahmen entfernen */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);  /* optional: leichter Schatten */
 }
+/* Passwort-Optionen: Wenn Keyboard aktiv ist, Hover nicht zusätzlich highlighten */
+#containerPasswortResetStep1[data-input-mode="keyboard"] .passwort-reason:hover {
+  transform: none !important;
+  z-index: auto;
+  border: none !important;
+  box-shadow: none !important;
+}
+#containerPasswortResetStep1[data-input-mode="keyboard"] .passwort-reason.keyboard-selected {
+  transform: scale(1.10) !important;
+  z-index: 2;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+/* Passwort-Optionen: Hover nicht doppelt highlighten, Auswahl läuft über keyboard-selected */
 
 /* 3) „Coming Soon“-Kacheln bleiben ausgegraut und nicht fokussierbar */
 .tile[data-kachelname="Coming Soon"] {
@@ -627,6 +729,20 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   transform: translateY(-1px);
 }
 
+.ticket-delete-button {
+  background: #b01717;
+  border-color: #7f1111;
+  color: #fff;
+}
+
+.ticket-delete-button:hover {
+  box-shadow: 0 3px 8px rgba(176, 23, 23, 0.35);
+}
+
+.ticket-delete-button.is-confirm {
+  background: #7f1111;
+}
+
 .tickets-list {
   display: flex;
   flex-direction: column;
@@ -653,6 +769,21 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   width: 100%;
   box-sizing: border-box;
   position: relative;
+}
+
+.ticket-card.is-delete-mode {
+  cursor: pointer;
+}
+
+.ticket-card.is-delete-selected {
+  background: #ffd7d7;
+  border-color: #b01717;
+}
+
+.ticket-card.is-delete-selected .ticket-title,
+.ticket-card.is-delete-selected .ticket-meta,
+.ticket-card.is-delete-selected .ticket-details-list {
+  color: #4a0909;
 }
 
 .ticket-card.done {
