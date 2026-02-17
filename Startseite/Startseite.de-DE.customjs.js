@@ -50,6 +50,86 @@ function initializeApp() {
   }
 }
 
+const thisScript = document.querySelector('script[src*="Startseite.de-DE.customjs.js"]');
+const INFO_BANNER_CONFIG_URL = thisScript && thisScript.src
+  ? new URL("info-banner.json", thisScript.src).toString()
+  : "info-banner.json";
+const INFO_BANNER_POLL_MS = 15000;
+const DAILY_RELOAD_KEY = "dailyReloadDate";
+const MORNING_RELOAD_HOUR = 5;
+const INFO_BANNER_SYNC_KEY = "infoBannerMessage";
+const INFO_BANNER_SYNC_TS_KEY = "infoBannerMessageUpdatedAt";
+
+let lastInfoBannerText = "";
+let infoBannerRefreshInFlight = false;
+
+function getTodayLocalDate() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function applyInfoBannerText(text) {
+  if (!infoText || typeof text !== "string") return;
+  const cleanText = text.trim();
+  if (!cleanText || cleanText === lastInfoBannerText) return;
+  infoText.textContent = cleanText;
+  lastInfoBannerText = cleanText;
+}
+
+async function refreshInfoBannerText() {
+  if (!infoText || infoBannerRefreshInFlight) return;
+  infoBannerRefreshInFlight = true;
+  const url = `${INFO_BANNER_CONFIG_URL}?t=${Date.now()}`;
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && typeof data.message === "string") {
+      const msg = data.message.trim();
+      applyInfoBannerText(msg);
+      localStorage.setItem(INFO_BANNER_SYNC_KEY, msg);
+      localStorage.setItem(INFO_BANNER_SYNC_TS_KEY, String(Date.now()));
+    }
+  } catch (_) {
+    try {
+      const cached = localStorage.getItem(INFO_BANNER_SYNC_KEY);
+      if (cached) applyInfoBannerText(cached);
+    } catch (_) {}
+  } finally {
+    infoBannerRefreshInFlight = false;
+  }
+}
+
+function scheduleDailyReload() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(MORNING_RELOAD_HOUR, 0, 0, 0);
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+  const delay = next.getTime() - now.getTime();
+  setTimeout(() => {
+    const today = getTodayLocalDate();
+    localStorage.setItem(DAILY_RELOAD_KEY, today);
+    window.location.reload();
+  }, delay);
+}
+
+function enforceDailyReload() {
+  const now = new Date();
+  const today = getTodayLocalDate();
+  const lastReloadDate = localStorage.getItem(DAILY_RELOAD_KEY);
+  if (now.getHours() >= MORNING_RELOAD_HOUR && lastReloadDate !== today) {
+    localStorage.setItem(DAILY_RELOAD_KEY, today);
+    window.location.reload();
+    return;
+  }
+  scheduleDailyReload();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupBlinkingPlaceholder(inputs.gutschein);
   setupBlinkingPlaceholder(inputs.gutscheinWert);
@@ -64,5 +144,23 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.values(inputs).forEach(setupBlinkingPlaceholder);
 
   initSessionTimer();
+  if (buttons.reset) {
+    buttons.reset.style.display = "inline-block";
+  }
+  refreshInfoBannerText();
+  setInterval(refreshInfoBannerText, INFO_BANNER_POLL_MS);
+  window.addEventListener("focus", refreshInfoBannerText);
+  window.addEventListener("online", refreshInfoBannerText);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      refreshInfoBannerText();
+    }
+  });
+  window.addEventListener("storage", e => {
+    if (e.key === INFO_BANNER_SYNC_KEY && typeof e.newValue === "string") {
+      applyInfoBannerText(e.newValue);
+    }
+  });
+  enforceDailyReload();
   initializeApp();
 });

@@ -729,17 +729,17 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   transform: translateY(-1px);
 }
 
-.ticket-delete-button {
+#ticketsDeleteBtn {
   background: #b01717;
   border-color: #7f1111;
   color: #fff;
 }
 
-.ticket-delete-button:hover {
+#ticketsDeleteBtn:hover {
   box-shadow: 0 3px 8px rgba(176, 23, 23, 0.35);
 }
 
-.ticket-delete-button.is-confirm {
+#ticketsDeleteBtn.is-confirm {
   background: #7f1111;
 }
 
