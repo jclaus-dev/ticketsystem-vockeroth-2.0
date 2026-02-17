@@ -89,7 +89,15 @@ function handleDeleteModeButtonClick() {
   }
 
   if (!selectedTicketIds.size) {
-    alert("Bitte zuerst mindestens ein Ticket auswählen.");
+    const shouldExitDeleteMode = window.confirm(
+      "Kein Ticket ausgew\u00e4hlt. M\u00f6chtest du den L\u00f6schmodus beenden?"
+    );
+    if (shouldExitDeleteMode) {
+      deleteModeActive = false;
+      clearDeleteSelection();
+      updateDeleteButtonState();
+      renderTickets();
+    }
     return;
   }
 

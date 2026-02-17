@@ -50,12 +50,18 @@ function initializeApp() {
   }
 }
 
-const INFO_BANNER_CONFIG_URL = "info-banner.json";
-const INFO_BANNER_POLL_MS = 30000;
+const thisScript = document.querySelector('script[src*="Startseite.de-DE.customjs.js"]');
+const INFO_BANNER_CONFIG_URL = thisScript && thisScript.src
+  ? new URL("info-banner.json", thisScript.src).toString()
+  : "info-banner.json";
+const INFO_BANNER_POLL_MS = 15000;
 const DAILY_RELOAD_KEY = "dailyReloadDate";
 const MORNING_RELOAD_HOUR = 5;
+const INFO_BANNER_SYNC_KEY = "infoBannerMessage";
+const INFO_BANNER_SYNC_TS_KEY = "infoBannerMessageUpdatedAt";
 
 let lastInfoBannerText = "";
+let infoBannerRefreshInFlight = false;
 
 function getTodayLocalDate() {
   const now = new Date();
@@ -74,16 +80,27 @@ function applyInfoBannerText(text) {
 }
 
 async function refreshInfoBannerText() {
-  if (!infoText) return;
+  if (!infoText || infoBannerRefreshInFlight) return;
+  infoBannerRefreshInFlight = true;
   const url = `${INFO_BANNER_CONFIG_URL}?t=${Date.now()}`;
   try {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) return;
     const data = await res.json();
     if (data && typeof data.message === "string") {
-      applyInfoBannerText(data.message);
+      const msg = data.message.trim();
+      applyInfoBannerText(msg);
+      localStorage.setItem(INFO_BANNER_SYNC_KEY, msg);
+      localStorage.setItem(INFO_BANNER_SYNC_TS_KEY, String(Date.now()));
     }
-  } catch (_) {}
+  } catch (_) {
+    try {
+      const cached = localStorage.getItem(INFO_BANNER_SYNC_KEY);
+      if (cached) applyInfoBannerText(cached);
+    } catch (_) {}
+  } finally {
+    infoBannerRefreshInFlight = false;
+  }
 }
 
 function scheduleDailyReload() {
@@ -127,8 +144,23 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.values(inputs).forEach(setupBlinkingPlaceholder);
 
   initSessionTimer();
+  if (buttons.reset) {
+    buttons.reset.style.display = "inline-block";
+  }
   refreshInfoBannerText();
   setInterval(refreshInfoBannerText, INFO_BANNER_POLL_MS);
+  window.addEventListener("focus", refreshInfoBannerText);
+  window.addEventListener("online", refreshInfoBannerText);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      refreshInfoBannerText();
+    }
+  });
+  window.addEventListener("storage", e => {
+    if (e.key === INFO_BANNER_SYNC_KEY && typeof e.newValue === "string") {
+      applyInfoBannerText(e.newValue);
+    }
+  });
   enforceDailyReload();
   initializeApp();
 });
