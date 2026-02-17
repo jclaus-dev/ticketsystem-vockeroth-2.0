@@ -50,6 +50,69 @@ function initializeApp() {
   }
 }
 
+const INFO_BANNER_CONFIG_URL = "info-banner.json";
+const INFO_BANNER_POLL_MS = 30000;
+const DAILY_RELOAD_KEY = "dailyReloadDate";
+const MORNING_RELOAD_HOUR = 5;
+
+let lastInfoBannerText = "";
+
+function getTodayLocalDate() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function applyInfoBannerText(text) {
+  if (!infoText || typeof text !== "string") return;
+  const cleanText = text.trim();
+  if (!cleanText || cleanText === lastInfoBannerText) return;
+  infoText.textContent = cleanText;
+  lastInfoBannerText = cleanText;
+}
+
+async function refreshInfoBannerText() {
+  if (!infoText) return;
+  const url = `${INFO_BANNER_CONFIG_URL}?t=${Date.now()}`;
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && typeof data.message === "string") {
+      applyInfoBannerText(data.message);
+    }
+  } catch (_) {}
+}
+
+function scheduleDailyReload() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(MORNING_RELOAD_HOUR, 0, 0, 0);
+  if (next <= now) {
+    next.setDate(next.getDate() + 1);
+  }
+  const delay = next.getTime() - now.getTime();
+  setTimeout(() => {
+    const today = getTodayLocalDate();
+    localStorage.setItem(DAILY_RELOAD_KEY, today);
+    window.location.reload();
+  }, delay);
+}
+
+function enforceDailyReload() {
+  const now = new Date();
+  const today = getTodayLocalDate();
+  const lastReloadDate = localStorage.getItem(DAILY_RELOAD_KEY);
+  if (now.getHours() >= MORNING_RELOAD_HOUR && lastReloadDate !== today) {
+    localStorage.setItem(DAILY_RELOAD_KEY, today);
+    window.location.reload();
+    return;
+  }
+  scheduleDailyReload();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   setupBlinkingPlaceholder(inputs.gutschein);
   setupBlinkingPlaceholder(inputs.gutscheinWert);
@@ -64,5 +127,8 @@ document.addEventListener("DOMContentLoaded", () => {
   Object.values(inputs).forEach(setupBlinkingPlaceholder);
 
   initSessionTimer();
+  refreshInfoBannerText();
+  setInterval(refreshInfoBannerText, INFO_BANNER_POLL_MS);
+  enforceDailyReload();
   initializeApp();
 });
