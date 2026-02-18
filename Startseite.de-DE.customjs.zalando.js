@@ -87,7 +87,13 @@ buttons.addSecondEAN.addEventListener("click", () => {
   if (activeEanCount >= eanFields.length) {
     buttons.addSecondEAN.style.display = "none";
   }
-  nextField.input.focus();
+  // If nothing is typed yet, keep the cursor in the first EAN field.
+  const hasTypedAnyEan = eanFields.some(field => field.input.value.trim() !== "");
+  if (!hasTypedAnyEan) {
+    inputs.ean1.focus();
+  } else {
+    nextField.input.focus();
+  }
   updateConfirmState();
 });
 
