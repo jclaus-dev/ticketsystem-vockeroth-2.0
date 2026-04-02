@@ -172,23 +172,11 @@
       /* ================ Handbuch ================= */
       .handbuch-container {
         width: 100%;
-        max-width: 1440px;
+        max-width: 980px;
         margin: 18px auto 40px;
         display: none;
         flex-direction: column;
-        align-items: stretch;
-      }
-
-      .handbuch-overview-layout {
-        width: 100%;
-        display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(360px, 0.95fr);
-        gap: 28px;
-        align-items: start;
-      }
-
-      .handbuch-main-column {
-        min-width: 0;
+        align-items: center;
       }
 
       .handbuch-hero {
@@ -235,360 +223,6 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
-      }
-
-      .newsletter-panel {
-        background: #ffffff;
-        color: #111111;
-        border: 1px solid #e4dfd6;
-        border-radius: 14px;
-        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
-        padding: 18px 20px 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-        position: sticky;
-        top: 18px;
-        align-self: start;
-        height: 966px;
-      }
-
-      .newsletter-eyebrow {
-        display: inline-flex;
-        align-self: flex-start;
-        padding: 6px 12px;
-        border-radius: 999px;
-        background: #a92f2f;
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-      }
-
-      .newsletter-title {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 700;
-        color: #111111;
-      }
-
-      .newsletter-copy {
-        margin: 0;
-        color: #4f4a42;
-        line-height: 1.45;
-        font-size: 14px;
-      }
-
-      .newsletter-quick-select {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
-        align-items: stretch;
-        position: relative;
-        padding: 0;
-      }
-
-      #newsletterCurrentName {
-        display: none;
-      }
-
-      .newsletter-quick-btn,
-      .newsletter-more-btn,
-      .newsletter-nav-btn {
-        min-height: 44px;
-        border: 1px solid #d4cec3;
-        background: #f8f5ef;
-        color: #222222;
-        border-radius: 10px;
-        padding: 8px 12px;
-        font-size: 13px;
-        font-weight: 600;
-        line-height: 1.25;
-        text-align: center;
-        cursor: pointer;
-        transition: background 0.15s ease, border-color 0.15s ease;
-        word-break: break-word;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .newsletter-btn-label {
-        display: block;
-      }
-
-      .newsletter-new-badge {
-        position: absolute;
-        top: 4px;
-        right: 4px;
-        background: #c52828;
-        color: #ffffff;
-        font-size: 9px;
-        font-weight: 700;
-        line-height: 1;
-        border-radius: 999px;
-        padding: 3px 5px;
-        letter-spacing: 0.04em;
-        transform: rotate(14deg);
-      }
-
-      .newsletter-quick-btn:hover,
-      .newsletter-more-btn:hover,
-      .newsletter-nav-btn:hover {
-        background: #f0eadf;
-        border-color: #b79c7d;
-      }
-
-      .newsletter-quick-btn.is-active,
-      .newsletter-more-btn.is-active {
-        background: #8E7355;
-        border-color: #8E7355;
-        color: #ffffff;
-      }
-
-      .newsletter-nav-btn {
-        width: 32px;
-        min-width: 32px;
-        height: 32px;
-        min-height: 32px;
-        padding: 0;
-        font-size: 18px;
-        line-height: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 50%;
-        z-index: 2;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgba(214, 206, 194, 0.96);
-        color: #8a7a66;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-        transform: translateY(-50%);
-        opacity: 0.46;
-        pointer-events: auto;
-        backdrop-filter: blur(2px);
-      }
-
-      .newsletter-nav-btn:disabled {
-        opacity: 0;
-        pointer-events: none;
-        cursor: default;
-      }
-
-      .newsletter-nav-btn:first-child {
-        left: 6px;
-      }
-
-      .newsletter-nav-btn:last-child {
-        right: 6px;
-      }
-
-      .newsletter-quick-select:hover .newsletter-nav-btn:not(:disabled),
-      .newsletter-quick-select:focus-within .newsletter-nav-btn:not(:disabled) {
-        opacity: 0.92;
-      }
-
-      .newsletter-more-panel {
-        display: none;
-      }
-
-      .newsletter-more-empty {
-        display: none;
-        border: 1px dashed #d0c6b8;
-        border-radius: 10px;
-        padding: 12px;
-        color: #6d665d;
-        font-size: 13px;
-        background: #fbf9f5;
-      }
-
-      .newsletter-pdf-frame {
-        border: 1px solid #d8cfc2;
-        border-radius: 14px;
-        overflow: hidden;
-        background: #ffffff;
-        flex: 1;
-        min-height: 420px;
-        position: relative;
-      }
-
-      .newsletter-pdf-frame iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-        display: block;
-        background: #ffffff;
-      }
-
-      .newsletter-fullscreen-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 3;
-        border: 1px solid rgba(214, 206, 194, 0.96);
-        background: rgba(255, 255, 255, 0.9);
-        color: #6e604f;
-        border-radius: 999px;
-        width: 38px;
-        height: 38px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
-        padding: 0;
-        line-height: 0;
-      }
-
-      .newsletter-fullscreen-btn:hover {
-        background: rgba(255, 255, 255, 0.98);
-        border-color: #b79c7d;
-      }
-
-      .newsletter-fullscreen-btn svg {
-        display: block;
-        flex: none;
-      }
-
-      .newsletter-pdf-frame:fullscreen {
-        background: #ffffff;
-        border-radius: 0;
-        border: none;
-      }
-
-      .newsletter-pdf-frame:fullscreen .newsletter-fullscreen-btn {
-        top: 16px;
-        right: 16px;
-      }
-
-      @media (max-width: 1180px) {
-        .handbuch-overview-layout {
-          grid-template-columns: 1fr;
-        }
-
-        .newsletter-panel {
-          position: static;
-          height: auto;
-        }
-      }
-
-      @media (max-width: 1180px) and (min-width: 900px) and (max-height: 820px) {
-        .handbuch-container {
-          max-width: 1000px;
-          margin: 10px auto 16px;
-        }
-
-        .handbuch-overview-layout {
-          grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
-          gap: 16px;
-          align-items: start;
-        }
-
-        .handbuch-hero {
-          padding: 14px 16px;
-          border-radius: 8px;
-        }
-
-        .handbuch-title {
-          margin: 0 0 10px;
-          font-size: 18px;
-        }
-
-        .handbuch-search {
-          padding: 9px 11px;
-        }
-
-        .handbuch-search input {
-          font-size: 14px;
-        }
-
-        .handbuch-start-results {
-          margin-top: 12px;
-          padding: 10px 12px;
-        }
-
-        .handbuch-list {
-          margin-top: 12px;
-          gap: 10px;
-        }
-
-        .handbuch-card {
-          padding: 12px 14px;
-          gap: 14px;
-          border-radius: 8px;
-        }
-
-        .handbuch-icon {
-          width: 38px;
-          height: 38px;
-        }
-
-        .handbuch-icon svg {
-          width: 28px;
-          height: 28px;
-        }
-
-        .handbuch-card h3 {
-          font-size: 16px;
-        }
-
-        .handbuch-card p {
-          margin: 2px 0 4px;
-          font-size: 13px;
-        }
-
-        .handbuch-meta {
-          font-size: 12px;
-        }
-
-        .newsletter-panel {
-          padding: 14px 14px 12px;
-          gap: 10px;
-          border-radius: 10px;
-          position: sticky;
-          top: 10px;
-          height: calc(100vh - 20px);
-        }
-
-        .newsletter-eyebrow {
-          padding: 5px 10px;
-          font-size: 11px;
-        }
-
-        .newsletter-title {
-          font-size: 19px;
-        }
-
-        .newsletter-quick-select {
-          gap: 8px;
-        }
-
-        .newsletter-quick-btn,
-        .newsletter-nav-btn {
-          min-height: 38px;
-          font-size: 12px;
-          padding: 6px 10px;
-        }
-
-        .newsletter-nav-btn {
-          width: 28px;
-          min-width: 28px;
-          height: 28px;
-          min-height: 28px;
-          font-size: 16px;
-        }
-
-        .newsletter-pdf-frame {
-          min-height: 0;
-        }
-      }
-
-      @media (max-width: 760px) {
-        .newsletter-quick-select,
-        .newsletter-more-panel {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
       }
 
       .handbuch-start-results {
@@ -950,148 +584,12 @@
     
         .user-fields {
           flex-wrap: wrap;
-          justify-content: center;
-          align-items: flex-end;
           gap: 10px;
-          width: 100%;
-        }
-
-        .form-field {
-          align-items: flex-start;
         }
     
         .form-field input {
-          flex: 0 0 auto;
-          width: 150px;
-          max-width: 150px;
-          height: 40px;
-          padding: 8px;
-          font-size: 14px;
-        }
-
-        #saveBtn,
-        #resetBtn {
-          margin-top: 0;
-          min-width: 112px;
-          height: 40px;
-          padding: 8px 12px;
-          font-size: 14px;
-        }
-      }
-
-      /* ================ Kompaktlayout ab 1430px und für 4:3 ========== */
-      @media (max-width: 1430px), (max-aspect-ratio: 4/3) {
-        .main-navbar {
-          padding: 0.65rem 1.2rem;
-        }
-
-        .logo-link img {
-          height: 32px;
-        }
-
-        .filial-name {
-          font-size: 1.1rem;
-        }
-
-        .center-content {
-          padding-top: 16px !important;
-          padding-bottom: 16px !important;
-        }
-
-        .info-banner {
-          width: 94% !important;
-          margin: 0 auto 14px !important;
-          padding: 10px 14px !important;
-          gap: 12px !important;
-        }
-
-        #infoText {
-          font-size: 16px !important;
-          line-height: 1.25 !important;
-        }
-
-        .user-fields-wrapper {
-          width: 96% !important;
-          max-width: 980px !important;
-          margin: 0 auto 12px !important;
-          justify-content: center !important;
-          gap: 8px !important;
-        }
-
-        .tab-strip {
-          width: 100%;
-          justify-content: center;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .tab-button {
-          min-height: 34px;
-          padding: 6px 12px;
-          font-size: 14px;
-        }
-
-        .user-fields {
-          width: 100%;
-          justify-content: center;
-          align-items: flex-end;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .form-field label {
-          font-size: 12px;
-          margin-bottom: 2px;
-        }
-
-        .form-field input {
-          width: 140px;
-          font-size: 14px;
-          padding: 8px;
-        }
-
-        #saveBtn,
-        #resetBtn {
-          min-width: 112px;
-          height: 40px;
-          margin-top: 0;
-          padding: 8px 12px;
-          font-size: 14px;
-        }
-
-        #tileContainer {
-          max-width: 900px !important;
-          margin: 10px auto 16px !important;
-          padding: 0 8px !important;
-          gap: 14px !important;
-        }
-
-        #tileContainer .tile {
-          flex: 0 1 calc(50% - 7px) !important;
-          height: 175px !important;
-          padding: 12px 10px !important;
-        }
-
-        #tileContainer .tile img {
-          width: 46px !important;
-          height: 46px !important;
-          margin-bottom: 8px !important;
-        }
-
-        #tileContainer .tile strong {
-          font-size: 15px !important;
-        }
-
-        .tile.clickable:hover,
-        .tile.clickable.keyboard-selected {
-          transform: scale(1.03) !important;
-        }
-
-        .footer-contact {
-          position: static !important;
-          padding: 10px 12px 12px !important;
-          font-size: 14px !important;
-          margin-top: 4px;
+          flex: 1 1 120px;
+          max-width: 180px;
         }
       }
     </style>
@@ -1103,7 +601,7 @@
     <div class="page-wrapper">
       <div class="center-content" style="background-color: #788f78;">
         <!-- Personal- & Filialnummer -->
-        <div id="infoBanner" class="info-banner"><img src="web-files/3305969.png" alt="3305969" name="3305969.png"
+        <div class="info-banner"><img src="web-files/3305969.png" alt="3305969" name="3305969.png"
             class="info-icon" /><span id="infoText" style="font-size: 20px; line-height: 1.4; font-weight: bold;">Hier könnten wichtige Informationen stehen. Bitte immer darauf achten!!!!!</span></div>
         <!-- ───────── User-Eingaben ───────── -->
         <div class="user-fields-wrapper" id="user-fields-wrapper">
@@ -1189,27 +687,24 @@
               <button id="ticketsExportBtn" class="filter-button" type="button">Als Excel herunterladen</button>
             </div>
           </div>
-        <div id="ticketsLegend" class="tickets-legend">Hinweis: Grüne Tickets bedeuten, dass das Online Team sie bereits erledigt hat.</div>
         <div id="ticketsEmpty" style="color: white; text-align: center; display: none;">Noch keine Tickets vorhanden.</div>
         <div id="ticketsList" class="tickets-list"></div>
       </div>
       <div id="containerHandbuch" class="handbuch-container">
-        <div class="handbuch-overview-layout">
-          <div class="handbuch-main-column">
-            <div class="handbuch-hero">
-              <h1 class="handbuch-title">Wissendatenbank Online Team</h1>
-              <div class="handbuch-search">
-                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fill="currentColor" d="M11 2a9 9 0 1 0 5.657 15.657l4.243 4.243 1.414-1.414-4.243-4.243A9 9 0 0 0 11 2zm0 2a7 7 0 1 1-4.95 11.95A7 7 0 0 1 11 4z"/>
-                </svg>
-                <input id="handbuchStartSearchInput" type="text" placeholder="Nach Beitraegen suchen ..." autocomplete="off" />
-              </div>
-            </div>
-            <div id="handbuchStartResults" class="handbuch-start-results">
-              <div class="handbuch-start-results-header">Gefundene Beitraege</div>
-              <div id="handbuchStartResultsList"></div>
-            </div>
-            <div class="handbuch-list">
+        <div class="handbuch-hero">
+          <h1 class="handbuch-title">Ratschläge und Antworten vom Michelberger Digital-Team</h1>
+          <div class="handbuch-search">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M11 2a9 9 0 1 0 5.657 15.657l4.243 4.243 1.414-1.414-4.243-4.243A9 9 0 0 0 11 2zm0 2a7 7 0 1 1-4.95 11.95A7 7 0 0 1 11 4z"/>
+            </svg>
+            <input id="handbuchStartSearchInput" type="text" placeholder="Nach Artikeln suchen ..." autocomplete="off" />
+          </div>
+        </div>
+        <div id="handbuchStartResults" class="handbuch-start-results">
+          <div class="handbuch-start-results-header">Gefundene Artikel</div>
+          <div id="handbuchStartResultsList"></div>
+        </div>
+        <div class="handbuch-list">
           <div class="handbuch-card is-clickable" data-handbuch-id="mboard">
             <div class="handbuch-icon">
               <svg width="36" height="36" viewBox="0 0 24 24" aria-hidden="true">
@@ -1219,7 +714,7 @@
             <div>
               <h3>M-board</h3>
               <p>Handbuch f&uuml;r M-board, Bestellungen und Versand</p>
-              <div class="handbuch-meta">6 Beitraege</div>
+              <div class="handbuch-meta">6 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="zalando">
@@ -1231,7 +726,7 @@
             <div>
               <h3>Zalando</h3>
               <p>Handbuch für Zalando</p>
-              <div class="handbuch-meta">7 Beitraege</div>
+              <div class="handbuch-meta">7 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="umtausch">
@@ -1243,7 +738,7 @@
             <div>
               <h3>Stationäres Geschäft</h3>
               <p>Alles rund um Stationäres Geschäft</p>
-              <div class="handbuch-meta">2 Beitraege</div>
+              <div class="handbuch-meta">2 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="abschliessen">
@@ -1255,7 +750,7 @@
             <div>
               <h3>Abschließen der Bestellungen (Zalando &amp; M-board)</h3>
               <p>Bestellungen t&auml;glich abschließen</p>
-              <div class="handbuch-meta">1 Beitrag</div>
+              <div class="handbuch-meta">1 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="irics">
@@ -1267,7 +762,7 @@
             <div>
               <h3>Irics</h3>
               <p>Irics Grundlagen</p>
-              <div class="handbuch-meta">3 Beitraege</div>
+              <div class="handbuch-meta">3 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="paketversand">
@@ -1279,7 +774,7 @@
             <div>
               <h3>Paketversand</h3>
               <p>Artikel pr&uuml;fen &amp; richtig verpacken</p>
-              <div class="handbuch-meta">2 Beitraege</div>
+              <div class="handbuch-meta">2 Artikel</div>
             </div>
           </div>
           <div class="handbuch-card is-clickable" data-handbuch-id="onlineshop">
@@ -1291,27 +786,9 @@
             <div>
               <h3>Onlineshop Bestellungen</h3>
               <p>Priorisierung &amp; Verpackung</p>
-              <div class="handbuch-meta">2 Beitraege</div>
+              <div class="handbuch-meta">2 Artikel</div>
             </div>
           </div>
-            </div>
-          </div>
-          <aside class="newsletter-panel" aria-labelledby="newsletterTitle">
-            <div class="newsletter-eyebrow">Newsletter</div>
-            <h2 id="newsletterTitle" class="newsletter-title">Aktuelle Newsletter</h2>
-            <div id="newsletterCurrentName" class="handbuch-meta">Wird geladen ...</div>
-            <div id="newsletterQuickSelect" class="newsletter-quick-select"></div>
-            <div id="newsletterMorePanel" class="newsletter-more-panel"></div>
-            <div id="newsletterEmpty" class="newsletter-more-empty">Kein aktueller Newsletter vorhanden.</div>
-            <div class="newsletter-pdf-frame">
-              <button id="newsletterFullscreenBtn" class="newsletter-fullscreen-btn" type="button" aria-label="Newsletter im Vollbild anzeigen" title="Vollbild">
-                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fill="currentColor" d="M7 3H3v4h2V5h2zm12 0h-4v2h2v2h2zM5 15H3v6h6v-2H5zm16 0h-2v4h-4v2h6z"/>
-                </svg>
-              </button>
-              <iframe id="newsletterFrame" title="Aktueller Newsletter" loading="lazy"></iframe>
-            </div>
-          </aside>
         </div>
       </div>
       <div id="containerHandbuchDetail" class="handbuch-detail">
@@ -1319,7 +796,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
             <path fill="currentColor" d="M11 2a9 9 0 1 0 5.657 15.657l4.243 4.243 1.414-1.414-4.243-4.243A9 9 0 0 0 11 2zm0 2a7 7 0 1 1-4.95 11.95A7 7 0 0 1 11 4z"/>
           </svg>
-          <input id="handbuchSearchInput" type="text" placeholder="Nach Beitraegen suchen ..." autocomplete="off" />
+          <input id="handbuchSearchInput" type="text" placeholder="Nach Artikeln suchen ..." autocomplete="off" />
         </div>
         <div class="handbuch-breadcrumb">
           <a href="#" id="handbuchBackLink">Alle Kollektionen</a> &nbsp;›&nbsp; <span id="handbuchCrumb">M-board</span>
@@ -1332,7 +809,7 @@
           </div>
           <h2 id="handbuchTitle" class="handbuch-detail-title">M-board</h2>
           <div id="handbuchSub" class="handbuch-detail-sub">Alle wichtigen M-board Funktionen</div>
-          <div id="handbuchCount" class="handbuch-detail-count">28 Beitraege</div>
+          <div id="handbuchCount" class="handbuch-detail-count">28 Artikel</div>
         </div>
         <div id="handbuchSections"></div>
       </div>
@@ -1484,9 +961,9 @@
           <!-- Neuer Pfeil-Button -->
           <div class="arrow-controls" style="margin-top: 20px;">
             <button id="reasonPrev2" type="button"
-              style="font-size: 40px; background: none; border: none; cursor: pointer;">&#8592;</button>
+              style="font-size: 60px; background: none; border: none; cursor: pointer;">&#8592;</button>
             <button id="confirmReasonBtn2" type="button"
-              style="font-size: 40px; border: none; background: none; color: white; cursor: pointer;">→</button>
+              style="font-size: 60px; border: none; background: none; color: white; cursor: pointer;">→</button>
           </div>
         </div>
     
@@ -1600,4 +1077,3 @@
 
 </body>
 </html>
-

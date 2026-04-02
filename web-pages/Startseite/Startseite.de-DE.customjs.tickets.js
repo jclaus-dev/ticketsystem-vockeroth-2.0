@@ -1,14 +1,37 @@
 /* Startseite: local ticket overview */
+const TICKET_RETENTION_DAYS = 7;
+
+function getTicketRetentionCutoffTs() {
+  const daysMs = TICKET_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  return Date.now() - daysMs;
+}
 
 function getTicketStorageKey() {
   const fil = inputs.filNr?.value.trim() || localStorage.getItem(SESSION_KEYS.filNr) || "unknown";
   return `tickets:${fil}`;
 }
 
+function pruneOldTickets(tickets) {
+  if (!Array.isArray(tickets) || !tickets.length) return [];
+
+  const cutoffTs = getTicketRetentionCutoffTs();
+  return tickets.filter(ticket => {
+    if (!ticket || typeof ticket !== "object") return false;
+    const createdTs = new Date(ticket.createdAt).getTime();
+    if (Number.isNaN(createdTs)) return true;
+    return createdTs >= cutoffTs;
+  });
+}
+
 function loadTickets() {
   try {
     const raw = localStorage.getItem(getTicketStorageKey());
-    return raw ? JSON.parse(raw) : [];
+    const parsed = raw ? JSON.parse(raw) : [];
+    const pruned = pruneOldTickets(parsed);
+    if (pruned.length !== parsed.length) {
+      localStorage.setItem(getTicketStorageKey(), JSON.stringify(pruned));
+    }
+    return pruned;
   } catch {
     return [];
   }
@@ -36,18 +59,24 @@ function saveTickets(tickets) {
 
 function recordTicket(entry) {
   const tickets = loadTickets();
-  tickets.unshift({
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+  const localId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const entryTicketId = typeof entry?.ticketId === "string" ? entry.ticketId.trim() : "";
+  const ticketId = entryTicketId || localId;
+  const createdTicket = {
+    id: localId,
+    ticketId,
     createdAt: new Date().toISOString(),
     personalnummer: inputs.persNr?.value.trim() || "",
     filialnummer: inputs.filNr?.value.trim() || "",
     done: false,
     typeKey: entry.typeKey || getTypeKeyFromName(entry.kachelname),
     ...entry
-  });
+  };
+  tickets.unshift(createdTicket);
   saveTickets(tickets);
   const openCount = tickets.filter(t => !t.done).length;
   updateTicketsTabLabel(openCount);
+  return createdTicket;
 }
 
 function formatDate(iso) {
@@ -65,6 +94,50 @@ const currentTicketFilters = {
 
 let filtersInitialized = false;
 let lastRenderedTickets = [];
+let deleteModeActive = false;
+const selectedTicketIds = new Set();
+
+function updateDeleteButtonState() {
+  const deleteBtn = document.getElementById("ticketsDeleteBtn");
+  if (!deleteBtn) return;
+  deleteBtn.textContent = deleteModeActive ? "Bestätigen" : "Löschen";
+  deleteBtn.classList.toggle("is-confirm", deleteModeActive);
+}
+
+function clearDeleteSelection() {
+  selectedTicketIds.clear();
+}
+
+function handleDeleteModeButtonClick() {
+  if (!deleteModeActive) {
+    deleteModeActive = true;
+    clearDeleteSelection();
+    updateDeleteButtonState();
+    renderTickets();
+    return;
+  }
+
+  if (!selectedTicketIds.size) {
+    const shouldExitDeleteMode = window.confirm(
+      "Kein Ticket ausgew\u00e4hlt. M\u00f6chtest du den L\u00f6schmodus beenden?"
+    );
+    if (shouldExitDeleteMode) {
+      deleteModeActive = false;
+      clearDeleteSelection();
+      updateDeleteButtonState();
+      renderTickets();
+    }
+    return;
+  }
+
+  const all = loadTickets();
+  const remaining = all.filter(ticket => !selectedTicketIds.has(ticket.id));
+  saveTickets(remaining);
+  deleteModeActive = false;
+  clearDeleteSelection();
+  updateDeleteButtonState();
+  renderTickets();
+}
 
 function updateFilterButtons(group, value) {
   const buttons = document.querySelectorAll(`[data-filter-group="${group}"]`);
@@ -112,6 +185,12 @@ function initTicketFilters() {
       exportTicketsToCsv(lastRenderedTickets);
     });
   }
+
+  const deleteBtn = document.getElementById("ticketsDeleteBtn");
+  if (deleteBtn) {
+    updateDeleteButtonState();
+    deleteBtn.addEventListener("click", handleDeleteModeButtonClick);
+  }
 }
 
 function updateTicketsTabLabel(openCount) {
@@ -123,6 +202,7 @@ function renderTickets() {
   const listEl = document.getElementById("ticketsList");
   const emptyEl = document.getElementById("ticketsEmpty");
   if (!listEl || !emptyEl) return;
+  startTicketStatusPolling();
 
   const tickets = loadTickets();
   const statusFilter = currentTicketFilters.status;
@@ -150,6 +230,11 @@ function renderTickets() {
     return true;
   });
 
+  const existingIds = new Set(tickets.map(ticket => ticket.id));
+  Array.from(selectedTicketIds).forEach(id => {
+    if (!existingIds.has(id)) selectedTicketIds.delete(id);
+  });
+
   lastRenderedTickets = filtered.slice();
   listEl.innerHTML = "";
 
@@ -164,6 +249,9 @@ function renderTickets() {
     card.className = `ticket-card${ticket.done ? " done" : ""} is-animated`;
     card.style.animationDelay = `${Math.min(200 * idx, 800)}ms`;
     card.dataset.id = ticket.id;
+    card.dataset.ticketId = (ticket.ticketId || ticket.id || "").trim();
+    if (deleteModeActive) card.classList.add("is-delete-mode");
+    if (selectedTicketIds.has(ticket.id)) card.classList.add("is-delete-selected");
 
     const info = document.createElement("div");
     info.className = "ticket-info";
@@ -206,26 +294,26 @@ function renderTickets() {
         renderTickets();
       }
     });
-    const toggleBtn = document.createElement("button");
-    toggleBtn.type = "button";
-    toggleBtn.className = "ticket-toggle";
-    toggleBtn.textContent = ticket.done ? "Nicht erledigt" : "Erledigt";
-    toggleBtn.addEventListener("click", () => {
-      const all = loadTickets();
-      const ticketIndex = all.findIndex(t => t.id === ticket.id);
-      if (ticketIndex >= 0) {
-        all[ticketIndex].done = !all[ticketIndex].done;
-        saveTickets(all);
-        renderTickets();
-      }
-    });
-    actions.appendChild(toggleBtn);
     actions.appendChild(fav);
+
+    if (deleteModeActive) {
+      card.addEventListener("click", evt => {
+        if (evt.target.closest(".ticket-actions")) return;
+        if (selectedTicketIds.has(ticket.id)) {
+          selectedTicketIds.delete(ticket.id);
+          card.classList.remove("is-delete-selected");
+        } else {
+          selectedTicketIds.add(ticket.id);
+          card.classList.add("is-delete-selected");
+        }
+      });
+    }
 
     card.appendChild(info);
     card.appendChild(actions);
     listEl.appendChild(card);
   });
+
 }
 
 function getTypeLabelFromKey(typeKey) {
@@ -319,6 +407,161 @@ if (buttons.handbuchTab) {
   });
 }
 
+// === SharePoint Status Sync ===
+// FLOW_URL: Power Automate HTTP endpoint (gleiches Flow-Endpoint, action=status)
+// Ticket selector: .ticket-card[data-ticket-id]
+// Optional selectors for title/checkbox/badge in TICKET_STATUS_SELECTORS
+const FLOW_URL = (typeof API_URL === "string" && API_URL) || "{{HIER_DEINE_FLOW_HTTP_URL}}";
+const POLL_INTERVAL_MS = 30000;
+
+const TICKET_STATUS_SELECTORS = {
+  ticket: ".ticket-card[data-ticket-id]",
+  title: ".ticket-title",
+  checkbox: 'input[type="checkbox"]',
+  badge: ".ticket-done-badge.done",
+  info: ".ticket-info",
+  actionButtons: ".ticket-actions button"
+};
+
+let ticketStatusPollingTimer = null;
+let ticketStatusSyncRunning = false;
+
+function isTicketsViewVisible() {
+  if (!containers?.tickets) return false;
+  return getComputedStyle(containers.tickets).display !== "none";
+}
+
+function collectTicketIdsFromDom() {
+  const ids = new Set();
+  document.querySelectorAll(TICKET_STATUS_SELECTORS.ticket).forEach(ticketEl => {
+    const ticketId = (ticketEl.dataset.ticketId || "").trim();
+    if (ticketId) ids.add(ticketId);
+  });
+  return Array.from(ids);
+}
+
+async function fetchStatuses(ticketIds) {
+  if (!ticketIds.length) return [];
+
+  const res = await fetch(FLOW_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "status",
+      ticketIds
+    })
+  });
+
+  if (!res.ok) {
+    throw new Error(`Statusabfrage fehlgeschlagen (${res.status})`);
+  }
+
+  const data = await res.json();
+  return Array.isArray(data?.tickets) ? data.tickets : [];
+}
+
+async function fetchTicketStatuses(ticketIds) {
+  return fetchStatuses(ticketIds);
+}
+
+function markTicketDone(ticketEl) {
+  ticketEl.classList.add("is-done");
+  ticketEl.classList.add("done");
+
+  const checkbox = ticketEl.querySelector(TICKET_STATUS_SELECTORS.checkbox);
+  if (checkbox) checkbox.checked = true;
+
+  const existingBadge = ticketEl.querySelector(TICKET_STATUS_SELECTORS.badge);
+  if (existingBadge) existingBadge.remove();
+}
+
+function markTicketUndone(ticketEl) {
+  ticketEl.classList.remove("is-done");
+  ticketEl.classList.remove("done");
+
+  const checkbox = ticketEl.querySelector(TICKET_STATUS_SELECTORS.checkbox);
+  if (checkbox) checkbox.checked = false;
+
+  const existingBadge = ticketEl.querySelector(TICKET_STATUS_SELECTORS.badge);
+  if (existingBadge) existingBadge.remove();
+
+}
+
+function applyStatusesToDom(tickets) {
+  if (!Array.isArray(tickets) || !tickets.length) return;
+
+  const statusMap = new Map();
+  tickets.forEach(item => {
+    const id = (item?.ticketId || "").trim();
+    const status = (item?.status || "").trim();
+    if (id) statusMap.set(id, status);
+  });
+  if (!statusMap.size) return;
+
+  // Lokalen Ticket-Status persistieren, damit der UI-Zustand wie beim manuellen Klick bleibt.
+  const allTickets = loadTickets();
+  let hasLocalChanges = false;
+  allTickets.forEach(ticket => {
+    const lookupId = (ticket.ticketId || ticket.id || "").trim();
+    if (!lookupId) return;
+    const status = (statusMap.get(lookupId) || "").trim().toLowerCase();
+    if (!status) return;
+
+    const shouldBeDone = status === "fertig";
+    if (ticket.done !== shouldBeDone) {
+      ticket.done = shouldBeDone;
+      hasLocalChanges = true;
+    }
+  });
+
+  if (hasLocalChanges) {
+    saveTickets(allTickets);
+    const openCount = allTickets.filter(t => !t.done).length;
+    updateTicketsTabLabel(openCount);
+    renderTickets();
+    return;
+  }
+
+  document.querySelectorAll(TICKET_STATUS_SELECTORS.ticket).forEach(ticketEl => {
+    const ticketId = (ticketEl.dataset.ticketId || "").trim();
+    if (!ticketId) return;
+    const status = (statusMap.get(ticketId) || "").trim().toLowerCase();
+    if (!status) return;
+    if (status === "fertig") {
+      markTicketDone(ticketEl);
+    } else {
+      markTicketUndone(ticketEl);
+    }
+  });
+}
+
+async function refreshTicketStatuses() {
+  if (!isTicketsViewVisible()) return;
+  if (ticketStatusSyncRunning) return;
+  const ticketIds = collectTicketIdsFromDom();
+  if (!ticketIds.length) return;
+
+  ticketStatusSyncRunning = true;
+  try {
+    const tickets = await fetchTicketStatuses(ticketIds);
+    applyStatusesToDom(tickets);
+  } catch (err) {
+    console.warn("Ticket-Status-Sync fehlgeschlagen.", err);
+  } finally {
+    ticketStatusSyncRunning = false;
+  }
+}
+
+function startStatusPolling() {
+  refreshTicketStatuses();
+  if (ticketStatusPollingTimer) return;
+  ticketStatusPollingTimer = setInterval(refreshTicketStatuses, POLL_INTERVAL_MS);
+}
+
+function startTicketStatusPolling() {
+  startStatusPolling();
+}
+
 const initialTickets = loadTickets();
 const initialOpenCount = initialTickets.filter(t => !t.done).length;
 updateTicketsTabLabel(initialOpenCount);
@@ -326,7 +569,7 @@ updateTicketsTabLabel(initialOpenCount);
 const HANDBUCH_DATA = {
   mboard: {
     title: "M-board",
-    subtitle: "Handbuch fÜr M-board, Bestellungen und Versand",
+    subtitle: "Handbuch für M-board, Bestellungen und Versand",
     count: "6 Artikel",
     sections: [
       {

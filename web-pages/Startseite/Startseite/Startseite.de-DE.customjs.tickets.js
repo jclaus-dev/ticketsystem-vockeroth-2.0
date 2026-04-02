@@ -847,7 +847,7 @@ let currentHandbuchQuery = "";
 let handbuchStartIndex = null;
 
 function normalizeHandbuchText(text) {
-  return repairHandbuchText(text)
+  return (text || "")
     .toString()
     .toLowerCase()
     .normalize("NFD")
@@ -856,31 +856,6 @@ function normalizeHandbuchText(text) {
     .replace(/[^a-z0-9]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-}
-
-function repairHandbuchText(text) {
-  return (text || "")
-    .toString()
-    .replace(/M�\?'Board/g, "M-Board")
-    .replace(/Online�\?'Team/g, "Online-Team")
-    .replace(/Zalando�\?'Retouren/g, "Zalando-Retouren")
-    .replace(/E�\?'Mail�\?'Adresse/g, "E-Mail-Adresse")
-    .replace(/E�\?'Mail/g, "E-Mail")
-    .replace(/E-MailAdresse/g, "E-Mail-Adresse")
-    .replace(/Anmelde-EMail/g, "Anmelde-E-Mail")
-    .replace(/regelmä�Yig/g, "regelmäßig")
-    .replace(/ordnungsgemä�Y/g, "ordnungsgemäß")
-    .replace(/ausschlie�Ylich/g, "ausschließlich")
-    .replace(/abschlie�Yend/g, "abschließend")
-    .replace(/Abschlie�Yeen/g, "Abschließen")
-    .replace(/Abschlie�Yen/g, "Abschließen")
-    .replace(/Grö�Ye/g, "Größe")
-    .replace(/gro�Yen/g, "großen")
-    .replace(/verschlie�Yen/g, "verschließen")
-    .replace(/�\?z/g, "„")
-    .replace(/�\?o/g, "“")
-    .replace(/�\?�/g, "“")
-    .replace(/erscheintz/g, "erscheint");
 }
 
 function splitHandbuchQuery(query) {
@@ -912,7 +887,7 @@ function buildHandbuchStartIndex() {
     data.sections.forEach(section => {
       (section.items || []).forEach(item => {
         const rawHtml = getHandbuchArticleContent(key, section.title || "", item);
-        const contentText = stripHandbuchHtml(repairHandbuchText(rawHtml));
+        const contentText = stripHandbuchHtml(rawHtml);
         index.push({
           key,
           collection: data.title || key,
@@ -969,8 +944,8 @@ function renderHandbuchStartResults(query) {
     row.className = "handbuch-start-result";
     row.innerHTML = `
       <div>
-        <div class="handbuch-start-result-title">${repairHandbuchText(item.title)}</div>
-        <div class="handbuch-start-result-meta">${repairHandbuchText(item.collection)} · ${repairHandbuchText(item.section)}</div>
+        <div class="handbuch-start-result-title">${item.title}</div>
+        <div class="handbuch-start-result-meta">${item.collection} · ${item.section}</div>
       </div>
       <div class="handbuch-start-result-chevron">›</div>
     `;
@@ -1000,7 +975,7 @@ function renderHandbuchSections(data, query) {
     const wrapper = document.createElement("div");
     wrapper.className = "handbuch-section";
     const header = document.createElement("h4");
-    header.textContent = repairHandbuchText(section.title);
+    header.textContent = section.title;
     wrapper.appendChild(header);
 
     items.forEach(item => {
@@ -1009,7 +984,7 @@ function renderHandbuchSections(data, query) {
       row.className = "handbuch-article";
       row.dataset.sectionTitle = section.title;
       row.dataset.articleTitle = item;
-      row.innerHTML = `<span class="handbuch-article-title-text">${repairHandbuchText(item)}</span><span class="handbuch-article-chevron">›</span>`;
+      row.innerHTML = `<span class="handbuch-article-title-text">${item}</span><span class="handbuch-article-chevron">›</span>`;
       wrapper.appendChild(row);
     });
 
@@ -1037,10 +1012,10 @@ function renderHandbuchDetail(key) {
   if (!titleEl) return;
 
   currentHandbuchKey = key;
-  titleEl.textContent = repairHandbuchText(data.title);
-  subEl.textContent = repairHandbuchText(data.subtitle);
-  countEl.textContent = repairHandbuchText(data.count);
-  if (crumbEl) crumbEl.textContent = repairHandbuchText(data.title);
+  titleEl.textContent = data.title;
+  subEl.textContent = data.subtitle;
+  countEl.textContent = data.count;
+  if (crumbEl) crumbEl.textContent = data.title;
 
   renderHandbuchSections(data, currentHandbuchQuery);
 }
@@ -1463,14 +1438,14 @@ function renderHandbuchArticle(sectionTitle, articleTitle) {
   const sub = document.querySelector(".handbuch-article-sub");
   const content = document.getElementById("handbuchArticleContent");
   const data = HANDBUCH_DATA[currentHandbuchKey];
-  if (crumb && data) crumb.textContent = repairHandbuchText(data.title);
-  if (section) section.textContent = repairHandbuchText(sectionTitle);
-  if (titleCrumb) titleCrumb.textContent = repairHandbuchText(articleTitle);
-  if (title) title.textContent = repairHandbuchText(articleTitle);
+  if (crumb && data) crumb.textContent = data.title;
+  if (section) section.textContent = sectionTitle;
+  if (titleCrumb) titleCrumb.textContent = articleTitle;
+  if (title) title.textContent = articleTitle;
   if (sub) sub.textContent = "";
   if (content) {
     const html = getHandbuchArticleContent(currentHandbuchKey, sectionTitle, articleTitle);
-    content.innerHTML = repairHandbuchText(html || "<p>Kein Inhalt vorhanden.</p>");
+    content.innerHTML = html || "<p>Kein Inhalt vorhanden.</p>";
   }
 }
 

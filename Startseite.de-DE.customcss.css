@@ -4,14 +4,22 @@ body {
   margin: 0;
   background-color: #788f78 !important;
 }
+
+body.home-view {
+  overflow-y: hidden;
+}
+
+body.tickets-view {
+  overflow-y: hidden;
+}
 html, body {
   height: 100%;
 }
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  height: 100vh;
+  min-height: 0;
+  height: auto;
 }
 .center-content {
   flex: 1 1 auto !important;
@@ -31,6 +39,11 @@ html, body {
   width: 100%;
   z-index: 10;
   padding-bottom: 18px;
+  display: none;
+}
+
+body.home-view .footer-contact {
+  display: block;
 }
 
 /* Info-Banner */
@@ -148,6 +161,7 @@ html, body {
   align-items: center;
   justify-content: center;
   border-radius: 6px;
+  cursor: text;
 }
 .code-box input {
   font-size: 18px;
@@ -157,6 +171,23 @@ html, body {
   text-align: center;
   background: none;
   outline: none;
+}
+
+.ean-remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  border-radius: 50%;
+  background: #d93025;
+  color: #fff;
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
 }
 .gutschein-buttons {
   display: flex;
@@ -493,6 +524,19 @@ html, body {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
+#containerBestellungOpt1[data-input-mode="keyboard"] .reason-grid button:hover,
+#containerBestellungOpt2[data-input-mode="keyboard"] .reason-grid button:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+#containerBestellungOpt1[data-input-mode="mouse"] .reason-grid button.keyboard-selected,
+#containerBestellungOpt2[data-input-mode="mouse"] .reason-grid button.keyboard-selected {
+  transform: none !important;
+  box-shadow: none !important;
+  z-index: auto !important;
+}
+
 /* ─── EAN-Tags innerhalb eines Buttons ─── */
 .ean-tags {
   margin-top: 4px;
@@ -598,8 +642,20 @@ button#confirmReason2:enabled {
 }
 
 .blink-placeholder::placeholder {
-  color: #4caf50;
+  color: #000;
   animation: blinkPlaceholder 1s steps(2, start) infinite;
+}
+
+.code-box {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.code-box.code-box-active {
+  border-style: solid !important;
+}
+
+.code-box.code-box-active-dashed {
+  border-style: dashed !important;
 }
 
 @keyframes blinkPlaceholder {
@@ -664,6 +720,11 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tab-button.is-active {
@@ -672,10 +733,61 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   transform: translateY(-1px);
 }
 
+.tab-button:disabled {
+  color: #8f8f8f;
+  border: 2px solid #9a9a9a;
+  opacity: 1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .tickets-container {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+#containerTickets {
+  position: relative;
+}
+
+.ticket-refresh-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 25, 10, 0.45);
+  border-radius: 12px;
+  z-index: 40;
+}
+
+.ticket-refresh-overlay.is-visible {
+  display: flex;
+}
+
+.ticket-refresh-panel {
+  background: rgba(255, 255, 255, 0.96);
+  color: #1f3a1f;
+  border: 2px solid #6a7b6a;
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 180px;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.ticket-refresh-percent {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ticket-refresh-label {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .ticket-filters {
@@ -683,6 +795,18 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   flex-direction: column;
   gap: 6px;
   margin: 4px 0 8px;
+}
+
+.tickets-legend {
+  color: #f4fff4;
+  background: rgba(70, 170, 75, 0.25);
+  border: 1px solid rgba(70, 170, 75, 0.7);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  align-self: flex-start;
+  margin: 0 0 8px;
 }
 
 .filter-group {
@@ -790,6 +914,28 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   background: #46aa4b;
   border-color: #46aa4b;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.ticket-card.done.is-delete-selected {
+  background: #ffd7d7 !important;
+  border-color: #b01717 !important;
+  box-shadow: inset 0 0 0 2px rgba(176, 23, 23, 0.15);
+}
+
+.ticket-card.done.is-delete-selected .ticket-title,
+.ticket-card.done.is-delete-selected .ticket-meta,
+.ticket-card.done.is-delete-selected .ticket-details-list {
+  color: #4a0909 !important;
+}
+
+.ticket-card.is-delete-selected {
+  opacity: 1 !important;
+}
+
+.ticket-card.done.is-delete-selected .ticket-toggle {
+  background: #ffecec !important;
+  color: #4a0909 !important;
+  border: 2px solid rgba(176, 23, 23, 0.35) !important;
 }
 
 .ticket-info {
@@ -935,4 +1081,42 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
     max-width: none;
     margin: 20px auto 40px;
   }
+}
+.ticket-card.is-done {
+  opacity: 0.6;
+}
+
+.ticket-card.is-done .ticket-title {
+  text-decoration: line-through;
+}
+
+.ticket-done-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.ticket-done-badge.done {
+  background: #e8f5e9;
+  color: #1f7a3f;
+  border: 1px solid #b9e6c5;
+}
+
+/* Delete selection must win over done/finished styling */
+#containerTickets .ticket-card.is-delete-mode.is-delete-selected,
+#containerTickets .ticket-card.done.is-delete-mode.is-delete-selected,
+#containerTickets .ticket-card.is-done.is-delete-mode.is-delete-selected {
+  background: #ffd7d7 !important;
+  border-color: #b01717 !important;
+  box-shadow: inset 0 0 0 2px rgba(176, 23, 23, 0.25) !important;
+  opacity: 1 !important;
+}
+
+#containerTickets .ticket-card.is-delete-mode.is-delete-selected .ticket-title,
+#containerTickets .ticket-card.is-delete-mode.is-delete-selected .ticket-meta,
+#containerTickets .ticket-card.is-delete-mode.is-delete-selected .ticket-details-list {
+  color: #4a0909 !important;
 }

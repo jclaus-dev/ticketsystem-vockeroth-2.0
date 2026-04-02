@@ -710,6 +710,48 @@ body.keyboard-mode .tile.clickable:hover:not(.keyboard-selected) {
   gap: 6px;
 }
 
+#containerTickets {
+  position: relative;
+}
+
+.ticket-refresh-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 25, 10, 0.45);
+  border-radius: 12px;
+  z-index: 40;
+}
+
+.ticket-refresh-overlay.is-visible {
+  display: flex;
+}
+
+.ticket-refresh-panel {
+  background: rgba(255, 255, 255, 0.96);
+  color: #1f3a1f;
+  border: 2px solid #6a7b6a;
+  border-radius: 12px;
+  padding: 14px 20px;
+  min-width: 180px;
+  text-align: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.ticket-refresh-percent {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ticket-refresh-label {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .ticket-filters {
   display: flex;
   flex-direction: column;
