@@ -10,6 +10,57 @@ const eanFields = [
 let activeEanCount = 1;
 const opt1Headline = document.querySelector("#containerBestellungOpt1 h2");
 
+function updateAddSecondEanPosition() {
+  const lastActiveIdx = Math.max(0, activeEanCount - 1);
+  const anchorBox = eanFields[lastActiveIdx]?.box || box1;
+  if (anchorBox && buttons.addSecondEAN) {
+    anchorBox.insertAdjacentElement("afterend", buttons.addSecondEAN);
+  }
+  buttons.addSecondEAN.style.display = activeEanCount >= eanFields.length ? "none" : "flex";
+}
+
+function removeEanAt(indexToRemove) {
+  if (indexToRemove <= 0 || indexToRemove >= activeEanCount) return;
+
+  // Shift following values left so active fields stay contiguous.
+  for (let i = indexToRemove; i < activeEanCount - 1; i += 1) {
+    eanFields[i].input.value = eanFields[i + 1].input.value;
+  }
+  eanFields[activeEanCount - 1].input.value = "";
+  eanFields[activeEanCount - 1].box.style.borderColor = "black";
+
+  activeEanCount -= 1;
+  for (let i = 1; i < eanFields.length; i += 1) {
+    eanFields[i].box.style.display = i < activeEanCount ? "flex" : "none";
+  }
+
+  updateAddSecondEanPosition();
+  const focusIndex = Math.min(indexToRemove, activeEanCount - 1);
+  if (eanFields[focusIndex]?.input) eanFields[focusIndex].input.focus();
+  updateConfirmState();
+}
+
+function setupEanRemoveButtons() {
+  for (let idx = 1; idx < eanFields.length; idx += 1) {
+    const field = eanFields[idx];
+    if (!field?.box) continue;
+    if (field.box.querySelector(".ean-remove-btn")) continue;
+
+    field.box.style.position = "relative";
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "ean-remove-btn";
+    removeBtn.setAttribute("aria-label", `EAN ${idx + 1} entfernen`);
+    removeBtn.textContent = "×";
+    removeBtn.addEventListener("click", evt => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      removeEanAt(idx);
+    });
+    field.box.appendChild(removeBtn);
+  }
+}
+
 function resetZalandoStep2() {
   inputs.ean1.value = "";
   inputs.ean2.value = "";
@@ -20,12 +71,9 @@ function resetZalandoStep2() {
     box.style.borderColor = "black";
     if (idx > 0) box.style.display = "none";
   });
-  buttons.addSecondEAN.style.display = "flex";
-  if (box1) {
-    box1.insertAdjacentElement("afterend", buttons.addSecondEAN);
-  }
-  confirmBtn.style.color = "white";
   activeEanCount = 1;
+  updateAddSecondEanPosition();
+  confirmBtn.style.color = "white";
 }
 
 zalandoNext.addEventListener("click", () => {
@@ -82,12 +130,15 @@ buttons.addSecondEAN.addEventListener("click", () => {
   if (activeEanCount >= eanFields.length) return;
   const nextField = eanFields[activeEanCount];
   nextField.box.style.display = "flex";
-  nextField.box.insertAdjacentElement("afterend", buttons.addSecondEAN);
   activeEanCount += 1;
-  if (activeEanCount >= eanFields.length) {
-    buttons.addSecondEAN.style.display = "none";
+  updateAddSecondEanPosition();
+  // If nothing is typed yet, keep the cursor in the first EAN field.
+  const hasTypedAnyEan = eanFields.some(field => field.input.value.trim() !== "");
+  if (!hasTypedAnyEan) {
+    inputs.ean1.focus();
+  } else {
+    nextField.input.focus();
   }
-  nextField.input.focus();
   updateConfirmState();
 });
 
@@ -177,11 +228,10 @@ function resetZalandoFlowCompletely() {
   buttons.confirmReason2.style.color = "white";
   buttons.confirmReason2.style.cursor = "not-allowed";
 
-  buttons.addSecondEAN.style.display = "flex";
-  if (box1) {
-    box1.insertAdjacentElement("afterend", buttons.addSecondEAN);
-  }
+  updateAddSecondEanPosition();
 }
+
+setupEanRemoveButtons();
 
 function buildReasonGrid1(grid, reasons, eans) {
   const assignments = {};

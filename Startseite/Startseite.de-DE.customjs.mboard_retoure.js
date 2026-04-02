@@ -48,6 +48,7 @@ if (buttons.mboardRetoureConfirm) {
     }
 
   try {
+    showView("tile");
     await sendPlannerTicket({
       kachelname: "M-Board Retoure",
       text: detailText

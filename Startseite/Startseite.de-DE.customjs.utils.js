@@ -110,3 +110,23 @@ function setupBlinkingPlaceholder(input) {
     }
   });
 }
+
+function setupCodeBoxClickFocus() {
+  document.addEventListener("click", evt => {
+    const box = evt.target.closest(".code-box");
+    if (!box) return;
+    if (evt.target.matches("input, textarea")) return;
+
+    const field = box.querySelector("input, textarea");
+    if (!field) return;
+    if (field.disabled || field.readOnly) return;
+
+    field.focus();
+    if (typeof field.setSelectionRange === "function") {
+      const len = field.value ? field.value.length : 0;
+      field.setSelectionRange(len, len);
+    }
+  });
+}
+
+setupCodeBoxClickFocus();

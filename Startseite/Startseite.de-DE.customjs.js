@@ -51,9 +51,19 @@ function initializeApp() {
 }
 
 const thisScript = document.querySelector('script[src*="Startseite.de-DE.customjs.js"]');
-const INFO_BANNER_CONFIG_URL = thisScript && thisScript.src
-  ? new URL("info-banner.json", thisScript.src).toString()
-  : "info-banner.json";
+const pageUrl = new URL(window.location.href);
+pageUrl.search = "";
+pageUrl.hash = "";
+const indexUrl = pageUrl.pathname.endsWith("/")
+  ? new URL("index.html", pageUrl).toString()
+  : pageUrl.toString();
+const INFO_BANNER_CONFIG_URLS = Array.from(new Set([
+  indexUrl,
+  new URL("index.html", window.location.href).toString(),
+  thisScript && thisScript.src ? new URL("index.html", thisScript.src).toString() : "",
+  new URL("info-banner.json", window.location.href).toString(),
+  thisScript && thisScript.src ? new URL("info-banner.json", thisScript.src).toString() : ""
+].filter(Boolean)));
 const INFO_BANNER_POLL_MS = 15000;
 const DAILY_RELOAD_KEY = "dailyReloadDate";
 const MORNING_RELOAD_HOUR = 5;
@@ -82,22 +92,39 @@ function applyInfoBannerText(text) {
 async function refreshInfoBannerText() {
   if (!infoText || infoBannerRefreshInFlight) return;
   infoBannerRefreshInFlight = true;
-  const url = `${INFO_BANNER_CONFIG_URL}?t=${Date.now()}`;
   try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data && typeof data.message === "string") {
-      const msg = data.message.trim();
-      applyInfoBannerText(msg);
-      localStorage.setItem(INFO_BANNER_SYNC_KEY, msg);
-      localStorage.setItem(INFO_BANNER_SYNC_TS_KEY, String(Date.now()));
+    for (const baseUrl of INFO_BANNER_CONFIG_URLS) {
+      const url = `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${Date.now()}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) continue;
+      const contentType = (res.headers.get("content-type") || "").toLowerCase();
+
+      if (contentType.includes("application/json")) {
+        const data = await res.json();
+        if (data && typeof data.message === "string") {
+          const msg = data.message.trim();
+          applyInfoBannerText(msg);
+          localStorage.setItem(INFO_BANNER_SYNC_KEY, msg);
+          localStorage.setItem(INFO_BANNER_SYNC_TS_KEY, String(Date.now()));
+          break;
+        }
+        continue;
+      }
+
+      const html = await res.text();
+      if (!html) continue;
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const remoteInfoEl = doc.getElementById("infoText");
+      const remoteText = remoteInfoEl ? remoteInfoEl.textContent : "";
+      if (typeof remoteText === "string" && remoteText.trim()) {
+        const msg = remoteText.trim();
+        applyInfoBannerText(msg);
+        localStorage.setItem(INFO_BANNER_SYNC_KEY, msg);
+        localStorage.setItem(INFO_BANNER_SYNC_TS_KEY, String(Date.now()));
+        break;
+      }
     }
   } catch (_) {
-    try {
-      const cached = localStorage.getItem(INFO_BANNER_SYNC_KEY);
-      if (cached) applyInfoBannerText(cached);
-    } catch (_) {}
   } finally {
     infoBannerRefreshInFlight = false;
   }

@@ -72,6 +72,7 @@ arrowNext.addEventListener("click", async e => {
   }
 
   try {
+    showView("tile");
     await sendPlannerTicket({
       kachelname:    "Online Gutscheine",
       gutscheincode: code,
@@ -113,6 +114,7 @@ buttons.popupNo.addEventListener("click", () => {
 
 async function sendGutschein() {
   try {
+    showView("tile");
     await sendPlannerTicket({
       kachelname:    currentTileName || "Online Gutscheine",
       gutscheincode: inputs.gutschein.value.trim(),

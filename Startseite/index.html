@@ -124,12 +124,22 @@
         border-radius: 6px;
       }
     
+      #filialnummer.is-invalid {
+        border: 2px solid red !important;
+      }
+
       #saveBtn {
         padding: 10px 20px;
         font-size: 16px;
         border-radius: 6px;
         cursor: pointer;
         margin-top: 23.5px;
+        min-width: 132px;
+        border: 2px solid #111;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #resetBtn {
@@ -139,6 +149,24 @@
         cursor: pointer;
         margin-top: 23.5px;
         background: #e6e6e6;
+        min-width: 132px;
+        border: 2px solid #111;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #resetBtn.is-ready {
+        background: ButtonFace;
+        color: ButtonText;
+        border: 2px solid #111;
+      }
+
+      #saveBtn:disabled {
+        border-color: #9a9a9a;
+        color: #8f8f8f;
+        cursor: not-allowed;
       }
 
       /* ================ Handbuch ================= */
@@ -574,7 +602,7 @@
       <div class="center-content" style="background-color: #788f78;">
         <!-- Personal- & Filialnummer -->
         <div class="info-banner"><img src="web-files/3305969.png" alt="3305969" name="3305969.png"
-            class="info-icon" /><span id="infoText" style="font-size: 20px; line-height: 1.4; font-weight: bold;">Hier könnten wichtige Informationen stehen. Bitte immer darauf achten!</span></div>
+            class="info-icon" /><span id="infoText" style="font-size: 20px; line-height: 1.4; font-weight: bold;">Hier könnten wichtige Informationen stehen. Bitte immer darauf achten!!!!!</span></div>
         <!-- ───────── User-Eingaben ───────── -->
         <div class="user-fields-wrapper" id="user-fields-wrapper">
           <div class="tab-strip">
@@ -654,7 +682,7 @@
               <button class="filter-button" type="button" data-filter-group="type" data-filter-value="mboard">Mboard Probleme</button>
               <button id="ticketsDeleteBtn" class="filter-button" type="button">Löschen</button>
               <div class="ticket-search">
-                <input id="ticketSearchInput" type="text" placeholder="Suche im Ticket..." autocomplete="off" />
+                <input id="ticketSearchInput" type="text" placeholder="Suche..." autocomplete="off" />
               </div>
               <button id="ticketsExportBtn" class="filter-button" type="button">Als Excel herunterladen</button>
             </div>
@@ -864,7 +892,7 @@
           <!-- EAN 1 -->
           <div id="kachelEAN1" class="code-box"
             style="border: 2px solid black; display: flex; align-items: center; justify-content: center; border-radius: 6px; width: 400px; height: 100px;">
-            <input id="step2Input1" type="text" placeholder="EAN 1"
+            <input id="step2Input1" type="text" placeholder="EAN 1" data-allow-empty="true"
               style="font-size: 18px; width: 90%; text-align: center; border: none;" />
           </div>
     
@@ -876,21 +904,21 @@
           <!-- EAN 2 (versteckt bis Klick auf Button) -->
           <div id="kachelEAN2" class="code-box"
             style="border: 2px solid black; display: none; align-items: center; justify-content: center; border-radius: 6px; width: 400px; height: 100px;">
-            <input id="step2Input2" type="text" placeholder="EAN 2 (optional)"
+            <input id="step2Input2" type="text" placeholder="EAN 2 (optional)" data-allow-empty="true"
               style="font-size: 18px; width: 90%; text-align: center; border: none;" />
           </div>
 
           <!-- EAN 3 (versteckt) -->
           <div id="kachelEAN3" class="code-box"
             style="border: 2px solid black; display: none; align-items: center; justify-content: center; border-radius: 6px; width: 400px; height: 100px;">
-            <input id="step2Input3" type="text" placeholder="EAN 3 (optional)"
+            <input id="step2Input3" type="text" placeholder="EAN 3 (optional)" data-allow-empty="true"
               style="font-size: 18px; width: 90%; text-align: center; border: none;" />
           </div>
           
           <!-- EAN 4 (versteckt) -->
           <div id="kachelEAN4" class="code-box"
             style="border: 2px solid black; display: none; align-items: center; justify-content: center; border-radius: 6px; width: 400px; height: 100px;">
-            <input id="step2Input4" type="text" placeholder="EAN 4 (optional)"
+            <input id="step2Input4" type="text" placeholder="EAN 4 (optional)" data-allow-empty="true"
               style="font-size: 18px; width: 90%; text-align: center; border: none;" />
           </div>
 
