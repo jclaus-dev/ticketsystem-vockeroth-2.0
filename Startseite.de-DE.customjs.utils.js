@@ -283,27 +283,6 @@ async function fetchNewsletterFilesFromManifest() {
   return [];
 }
 
-async function fetchNewsletterFilesFromDirectory() {
-  const res = await fetch(`PDF/?ts=${Date.now()}`, {
-    cache: "no-store"
-  });
-  if (!res.ok) throw new Error(`PDF-Verzeichnis ${res.status}`);
-  const html = await res.text();
-  const hrefMatches = [...html.matchAll(/href\s*=\s*["']([^"'#?]+\.pdf(?:\?[^"']*)?)["']/gi)];
-  const fileNames = hrefMatches
-    .map(match => {
-      const href = match[1].split("?")[0].trim();
-      const lastSegment = href.split("/").pop() || "";
-      try {
-        return decodeURIComponent(lastSegment);
-      } catch {
-        return lastSegment;
-      }
-    })
-    .filter(Boolean);
-  return Array.from(new Set(fileNames));
-}
-
 function normalizeNewsletterFiles(files) {
   return (files || [])
     .map(file => (file || "").toString().trim())
@@ -315,13 +294,7 @@ async function refreshNewsletterFiles() {
   if (newsletterRefreshInFlight) return newsletterFilesCache;
   newsletterRefreshInFlight = true;
   try {
-    let files = [];
-    try {
-      files = await fetchNewsletterFilesFromDirectory();
-    } catch {
-      files = await fetchNewsletterFilesFromManifest();
-    }
-
+    const files = await fetchNewsletterFilesFromManifest();
     const normalized = normalizeNewsletterFiles(files);
     if (normalized.length) {
       newsletterFilesCache = normalized;
