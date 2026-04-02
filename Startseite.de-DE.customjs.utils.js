@@ -70,6 +70,7 @@ function getNewsletterDisplayTitle(fileName) {
   return fileName
     .replace(/\.pdf$/i, "")
     .replace(/^\d+(?:\.\d+)?\.\s+/, "")
+    .replace(/\s+copy$/i, "")
     .replace(/_/g, " ")
     .trim();
 }
@@ -117,10 +118,6 @@ const NEWSLETTER_FILES_RESOLVED = [
   "17. Grundlagen zu M\u2011Board und Zalando.pdf",
   "18. GLS Retoure finden.pdf"
 ];
-
-if (!NEWSLETTER_FILES_RESOLVED.includes("19. TESTGLS Retoure finden.pdf")) {
-  NEWSLETTER_FILES_RESOLVED.push("19. TESTGLS Retoure finden.pdf");
-}
 
 let newsletterState = {
   activeFile: "",
